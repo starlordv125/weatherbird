@@ -9,13 +9,20 @@ struct ArgInfo {
 
 #[derive(Deserialize, Debug)]
 struct Obj {
-    current: JsonInfo
+    current: JsonInfo,
+    daily: Daily
 }
 
 #[derive(Deserialize, Debug)]
 struct JsonInfo {
     weather_code: u8,
     temperature_2m: f64
+}
+
+#[derive(Deserialize, Debug)]
+struct Daily {
+    temperature_2m_max: Vec<f64>,
+    temperature_2m_min: Vec<f64>
 }
 
 #[tokio::main]
@@ -29,7 +36,9 @@ async fn main() {
             let code = json.current.weather_code;
             //handle_json(json);
             print::print_weather(code);
-            println!("Temperature: {}", json.current.temperature_2m)
+            println!("Temperature: {}", json.current.temperature_2m);
+            println!("Min: {}", json.daily.temperature_2m_min[0]);
+            println!("Max: {}", json.daily.temperature_2m_max[0]);
         }
     }
 }
