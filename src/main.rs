@@ -1,6 +1,7 @@
 use std::{env, io::Write};
 use serde::Deserialize;
 mod print;
+mod conf;
 
 struct ArgInfo {
     days: u8,
@@ -25,16 +26,21 @@ struct Daily {
     temperature_2m_min: Vec<f64>
 }
 
+const VERSION: &str = "v0.2.0";
+
 #[tokio::main]
 async fn main() {
-    println!("Duck v0.1");
+    println!("Duck {}", VERSION);
     let info: ArgInfo = collect_args();
     match info.set {
-        true => {set()}
+        true => {
+            set();
+            conf::write_conf();
+        }
         false => {
+            // let lat, long = readconf()
             let json: Obj = meteo_get().await;
             let code = json.current.weather_code;
-            //handle_json(json);
             print::print_weather(code);
             println!("Temperature: {}", json.current.temperature_2m);
             println!("Min: {}", json.daily.temperature_2m_min[0]);
@@ -84,18 +90,28 @@ fn set() {
     print!("Latitude: ");
     std::io::stdout().flush().expect("Error flushing output");
     std::io::stdin().read_line(&mut lat).expect("Error reading user input");
+    input_error_check(lat.as_str());
     print!("Longitude: ");
     std::io::stdout().flush().expect("Error flushing output");
     std::io::stdin().read_line(&mut long).expect("Error reading user input");
+    input_error_check(long.as_str());
     lat = lat.trim().to_string();
     long = long.trim().to_string();
-    println!("{},{}", lat, long)
+    println!("{},{}", lat, long);
+}
+
+fn input_error_check(num: &str) {
+    match num.trim().parse::<f64>() {
+        Ok(_) => {}
+        Err(_) => {error("Value entered is not parseable");}
+    }
 }
 
 async fn meteo_get() -> Obj {
+    //let link: &str = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + long + "&daily=temperature_2m_max,temperature_2m_min,weather_code&current=temperature_2m,weather_code&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch";
     let response = reqwest::Client::new()
     //.get("https://api.open-meteo.com/v1/forecast?latitude=37.2&longitude=-80.41&daily=weather_code&timezone=auto&forecast_days=1") //debug
-    .get("https://api.open-meteo.com/v1/forecast?latitude=37.2&longitude=-80.41&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch")
+    .get("https://api.open-meteo.com/v1/forecast?latitude=37.2&longitude=-80.4&daily=temperature_2m_max,temperature_2m_min,weather_code&current=temperature_2m,weather_code&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch")
     .send()
     .await
     .unwrap()
