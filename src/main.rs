@@ -26,7 +26,7 @@ struct Daily {
     temperature_2m_min: Vec<f64>
 }
 
-const VERSION: &str = "v0.2.0";
+const VERSION: &str = "v0.3.0";
 
 #[tokio::main]
 async fn main() {
@@ -34,8 +34,8 @@ async fn main() {
     let info: ArgInfo = collect_args();
     match info.set {
         true => {
-            set();
-            conf::write_conf();
+            let (lat, long) = set();
+            conf::write_conf(lat, long);
         }
         false => {
             // let lat, long = readconf()
@@ -83,7 +83,7 @@ fn error(message: &str) {
 }
 
 // Will store config in ~/.config/duck/duck.conf
-fn set() {
+fn set() -> (String, String) { 
     let mut lat = String::new();
     let mut long = String::new();
     println!("Duck location setup");
@@ -97,7 +97,7 @@ fn set() {
     input_error_check(long.as_str());
     lat = lat.trim().to_string();
     long = long.trim().to_string();
-    println!("{},{}", lat, long);
+    return (lat, long);
 }
 
 fn input_error_check(num: &str) {
@@ -108,24 +108,15 @@ fn input_error_check(num: &str) {
 }
 
 async fn meteo_get() -> Obj {
-    //let link: &str = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + long + "&daily=temperature_2m_max,temperature_2m_min,weather_code&current=temperature_2m,weather_code&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch";
+    let conf: conf::TomlInfo = conf::read_conf();
+    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + &conf.long.as_str() + "&daily=temperature_2m_max,temperature_2m_min,weather_code&current=temperature_2m,weather_code&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch";
     let response = reqwest::Client::new()
-    //.get("https://api.open-meteo.com/v1/forecast?latitude=37.2&longitude=-80.41&daily=weather_code&timezone=auto&forecast_days=1") //debug
-    .get("https://api.open-meteo.com/v1/forecast?latitude=37.2&longitude=-80.4&daily=temperature_2m_max,temperature_2m_min,weather_code&current=temperature_2m,weather_code&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch")
+    .get(link)
     .send()
     .await
     .unwrap()
     .json::<Obj>()
     .await
     .unwrap();
-    //println!("{:?}", response);
     return response
 }
-/*
-fn handle_json(json: Obj) {
-    //let njson = serde_json::to_string(&json).expect("Error serializing");
-    //println!("{:?}", json.daily.weather_code);
-    //let params: JsonInfo = serde_json::from_value(json).expect("JSON was not parsed");
-    //println!("Weather code: {:?}", params.daily[0])
-}
-*/
