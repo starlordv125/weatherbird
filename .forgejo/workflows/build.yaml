@@ -7,5 +7,5 @@ jobs:
     runs-on: self-hosted
     steps:
       - run: echo "All good!"
-      - uses: actions/checkout
+      - uses: actions/checkout@v6
       - run: ls -la
