@@ -8,4 +8,14 @@ jobs:
     steps:
       - run: echo "All good!"
       - uses: actions/checkout@v6
-      - run: ls -la
+      - run: cargo test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: mkdir duck-linux-amd64
+      - run: cargo build --release
+      - run: cp target/release/duck duck-linux-amd64
+      - run: cp LICENSE duck-linux-amd64
+      - run: cp README.md duck-linux-amd64
+      - run: tar --zstd -cvf duck-linux-amd64.tar.zstd duck-linux-amd64
