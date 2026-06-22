@@ -27,11 +27,11 @@ struct Daily {
     temperature_2m_min: Vec<f64>
 }
 
-const VERSION: &str = "v0.3.0";
+const VERSION: &str = "v0.3.1";
 
 #[tokio::main]
 async fn main() {
-    println!("Duck {}", VERSION);
+    //println!("Duck {}", VERSION);
     let info: ArgInfo = collect_args();
     match info.set {
         true => {
@@ -54,12 +54,18 @@ async fn main() {
 fn collect_args() -> ArgInfo {
     let args: Vec<String> = env::args().collect();
     let mut days_next: bool = false;
+    let mut arg_error = false;
     let mut info = ArgInfo {
         days: 7,
         set: false
     };
     for arg in &args[1..] {
+        match arg_error {
+            true => {error("Incorrect arguement format")}
+            false => {}
+        }
         match days_next {
+            // reformat this
             true => {
                 match arg.parse::<u8>() {
                     Ok(o) => {println!("Days: {}", o);info.days = o}
@@ -70,12 +76,27 @@ fn collect_args() -> ArgInfo {
                 match arg.as_str() {
                 "set" => {info.set = true}
                 "--days" => {days_next = true}
+                "--help" => {help();arg_error = true}
                  _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
                 }
             }
         }
     }
     return info
+}
+
+fn help() {
+    println!("Duck version {} Copyright (C) 2026 Cameron Reynolds", VERSION);
+    println!("This program comes with ABSOLUTELY NO WARRANTY");
+    println!("This is free software, and you are welcome to redistribute it under certain conditions");
+    println!("--------------------------------------------------------------------------------------");
+    println!("Arguements");
+    println!("--help -> Displays this menu");
+    println!("set -> Allows you to set coordinates, will overwrite previous configuration");
+    println!("---------------------------------------------------------------------------");
+    println!("Repo: https://forgejo.starlordv125.net/");
+    println!("Maintainer email: cameron@starlordv125.net");
+    std::process::exit(0); // change later
 }
 
 // error() can be called by any function and will exit the program
