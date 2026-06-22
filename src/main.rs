@@ -43,7 +43,7 @@ async fn main() {
             let json: Obj = meteo_get().await;
             let code = json.current.weather_code;
             let is_day = json.current.is_day;
-            print::print_weather(1, 0);
+            print::print_weather(code, is_day);
             println!("Temperature: {}", json.current.temperature_2m);
             println!("Min: {}", json.daily.temperature_2m_min[0]);
             println!("Max: {}", json.daily.temperature_2m_max[0]);
