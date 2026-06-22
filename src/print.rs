@@ -29,20 +29,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("|-------------------------|");
                 println!("Partly cloudy");
             }
-            _ => {
-                println!("|-------------------------|");
-                println!("|                         |");
-                println!("|                         |");
-                println!("|                         |");
-                println!("|           ????          |");
-                println!("|           ????          |");
-                println!("|           ????          |");
-                println!("|                         |");
-                println!("|                         |");
-                println!("|                         |");
-                println!("|-------------------------|");
-                println!("Unknown");
-            }
+            _ => {}
         }
     } else {
         match code {
