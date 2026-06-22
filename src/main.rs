@@ -17,7 +17,8 @@ struct Obj {
 #[derive(Deserialize, Debug)]
 struct JsonInfo {
     weather_code: u8,
-    temperature_2m: f64
+    temperature_2m: f64,
+    is_day: u8
 }
 
 #[derive(Deserialize, Debug)]
@@ -41,7 +42,8 @@ async fn main() {
             // let lat, long = readconf()
             let json: Obj = meteo_get().await;
             let code = json.current.weather_code;
-            print::print_weather(code);
+            let is_day = json.current.is_day;
+            print::print_weather(1, 0);
             println!("Temperature: {}", json.current.temperature_2m);
             println!("Min: {}", json.daily.temperature_2m_min[0]);
             println!("Max: {}", json.daily.temperature_2m_max[0]);
@@ -109,9 +111,9 @@ fn input_error_check(num: &str) {
 
 async fn meteo_get() -> Obj {
     let conf: conf::TomlInfo = conf::read_conf();
-    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + &conf.long.as_str() + "&daily=temperature_2m_max,temperature_2m_min,weather_code&current=temperature_2m,weather_code&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch";
+    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + &conf.long.as_str() + "&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch";
     let response = reqwest::Client::new()
-    .get(link)
+    .get(&link)
     .send()
     .await
     .unwrap()
