@@ -78,7 +78,7 @@ fn collect_args() -> ArgInfo {
                 "--days" => {days_next = true}
                 "--version" => {println!("{}", VERSION);std::process::exit(0)}
                 "--help" => {help()}
-                 _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
+                _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
                 }
             }
         }
