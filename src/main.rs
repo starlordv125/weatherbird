@@ -54,16 +54,16 @@ async fn main() {
 fn collect_args() -> ArgInfo {
     let args: Vec<String> = env::args().collect();
     let mut days_next: bool = false;
-    let mut arg_error = false;
+    //let mut arg_error = false;
     let mut info = ArgInfo {
         days: 7,
         set: false
     };
     for arg in &args[1..] {
-        match arg_error {
+        /*match arg_error {
             true => {error("Incorrect arguement format")}
             false => {}
-        }
+        }*/
         match days_next {
             // reformat this
             true => {
@@ -77,7 +77,7 @@ fn collect_args() -> ArgInfo {
                 "set" => {info.set = true}
                 "--days" => {days_next = true}
                 "--version" => {println!("{}", VERSION);std::process::exit(0)}
-                "--help" => {help();arg_error = true}
+                "--help" => {help()}
                  _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
                 }
             }
