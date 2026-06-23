@@ -93,8 +93,8 @@ fn help() {
     println!("Arguements");
     println!("--help -> Displays this menu");
     println!("set -> Allows you to set coordinates, will overwrite previous configuration");
-    println!("---------------------------------------------------------------------------");
-    println!("Repo: https://forgejo.starlordv125.net/");
+    println!("--------------------------------------------------------------------------------------");
+    println!("Repo: https://forgejo.starlordv125.net/starlordv125/duck");
     println!("Maintainer email: cameron@starlordv125.net");
     std::process::exit(0); // change later
 }
