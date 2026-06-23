@@ -2,7 +2,7 @@ pub fn print_weather(code: u8, day: u8) {
     if (code == 0 || code == 1 || code == 2) && day == 1 {
         match code {
             0 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|    \\       |       /    |");
                 println!("|     \\      |      /     |");
                 println!("|       ------------      |");
@@ -16,7 +16,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Sunny");
             }
             1 | 2 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|    \\       |      /     |");
                 println!("|     \\      |     /      |");
                 println!("|       ------------      |");
@@ -34,7 +34,7 @@ pub fn print_weather(code: u8, day: u8) {
     } else {
         match code {
             0 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|      _______     *      |");
                 println!("|  *  /    _  \\  *        |");
                 println!("|    /  o / \\__\\          |");
@@ -48,7 +48,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Starry")
             }
             1 | 2 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|      _______     *      |");
                 println!("|  *  /    _  \\  *  __    |");
                 println!("|    /  o / \\__\\   /  \\   |");
@@ -62,7 +62,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Cloudy")
             }
             3 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -76,7 +76,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Overcast");
             }
             51 | 53 | 55 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -90,7 +90,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Light rain");
             }
             61 | 63 | 65 | 80 | 81 | 82 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -104,7 +104,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Heavy rain");
             }
             66 | 67 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -118,7 +118,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Freezing rain");
             }
             71 | 73 | 77 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -132,7 +132,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Light snow");
             }
             75 | 85 | 86 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -146,7 +146,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Heavy snow");
             }
             95 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -160,7 +160,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Stormy");
             }
             96 | 99 => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|              _____      |");
                 println!("|       ______/     \\     |");
                 println!("|      /             |    |");
@@ -174,7 +174,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("Hail");
             }
             _ => {
-                println!("|-------------------------|");
+                println!("\r|-------------------------|");
                 println!("|                         |");
                 println!("|                         |");
                 println!("|                         |");
