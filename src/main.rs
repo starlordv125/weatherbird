@@ -76,6 +76,7 @@ fn collect_args() -> ArgInfo {
                 match arg.as_str() {
                 "set" => {info.set = true}
                 "--days" => {days_next = true}
+                "--version" => {println!("{}", VERSION);std::process::exit(0)}
                 "--help" => {help();arg_error = true}
                  _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
                 }
@@ -87,11 +88,13 @@ fn collect_args() -> ArgInfo {
 
 fn help() {
     println!("Duck version {} Copyright (C) 2026 Cameron Reynolds", VERSION);
+    println!("License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>");
     println!("This program comes with ABSOLUTELY NO WARRANTY");
     println!("This is free software, and you are welcome to redistribute it under certain conditions");
     println!("--------------------------------------------------------------------------------------");
     println!("Arguements");
     println!("--help -> Displays this menu");
+    println!("--version -> Shows version number");
     println!("set -> Allows you to set coordinates, will overwrite previous configuration");
     println!("--------------------------------------------------------------------------------------");
     println!("Repo: https://forgejo.starlordv125.net/starlordv125/duck");
@@ -137,9 +140,9 @@ async fn meteo_get() -> Obj {
     .get(&link)
     .send()
     .await
-    .unwrap()
+    .expect("Error connecting to openmeteo")
     .json::<Obj>()
     .await
-    .unwrap();
+    .expect("Error parsing JSON");
     return response
 }
