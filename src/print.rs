@@ -10,8 +10,8 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("|  ___|              |___ |");
                 println!("|     |              |    |");
                 println!("|      \\____________/     |");
-                println!("|      /      |      \\    |");
-                println!("|     /       |       \\   |");
+                println!("|      /      |     \\     |");
+                println!("|     /       |      \\    |");
                 println!("|-------------------------|");
                 println!("Sunny");
             }
@@ -24,8 +24,8 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("|  ___|           _/-\\___ |");
                 println!("|     _          /_____\\  |");
                 println!("|   _/ \\_____________/    |");
-                println!("|  /     \\    |       \\   |");
-                println!("| /______/    |        \\  |");
+                println!("|  /     \\    |      \\    |");
+                println!("| /______/    |       \\   |");
                 println!("|-------------------------|");
                 println!("Partly cloudy");
             }
