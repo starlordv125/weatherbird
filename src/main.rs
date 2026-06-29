@@ -27,7 +27,7 @@ struct Daily {
     temperature_2m_min: Vec<f64>
 }
 
-const VERSION: &str = "v0.3.1";
+const VERSION: &str = "v0.3.2";
 
 #[tokio::main]
 async fn main() {
