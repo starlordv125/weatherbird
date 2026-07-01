@@ -8,20 +8,20 @@ struct ArgInfo {
     set: bool,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct Obj {
     current: JsonInfo,
     daily: Daily
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct JsonInfo {
     weather_code: u8,
     temperature_2m: f64,
     is_day: u8
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct Daily {
     temperature_2m_max: Vec<f64>,
     temperature_2m_min: Vec<f64>
@@ -87,7 +87,7 @@ fn collect_args() -> ArgInfo {
 }
 
 fn help() {
-    println!("Duck version {} Copyright (C) 2026 Cameron Reynolds", VERSION);
+    println!("Weatherbird version {} Copyright (C) 2026 Cameron Reynolds", VERSION);
     println!("License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>");
     println!("This program comes with ABSOLUTELY NO WARRANTY");
     println!("This is free software, and you are welcome to redistribute it under certain conditions");
@@ -108,7 +108,6 @@ fn error(message: &str) {
     std::process::exit(1);
 }
 
-// Will store config in ~/.config/duck/duck.conf
 fn set() -> (String, String) { 
     let mut lat = String::new();
     let mut long = String::new();

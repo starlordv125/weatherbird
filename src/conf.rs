@@ -11,7 +11,7 @@ pub struct TomlInfo {
 
 pub fn write_conf(lat: String, long: String) {
     let home = env::home_dir().expect("Error finding home directory").into_os_string().into_string().expect("Error parsing home_dir()");
-    let strpath = home + "/.config/duck/duck.toml";
+    let strpath = home + "/.config/weatherbird/weatherbird.toml";
     match fs::metadata(&strpath) {
         Ok(_) => {}
         Err(_) => {
@@ -34,10 +34,10 @@ pub fn write_conf(lat: String, long: String) {
 
 pub fn read_conf() -> TomlInfo {
     let home = env::home_dir().expect("Error finding home directory").into_os_string().into_string().expect("Error parsing home_dir()");
-    let strpath = home + "/.config/duck/duck.toml";
+    let strpath = home + "/.config/weatherbird/weatherbird.toml";
     match fs::metadata(&strpath) {
         Ok(_) => {},
-        Err(_) => {crate::error("Configuration file does not exist, use \"duck set\" to generate configuration");}
+        Err(_) => {crate::error("Configuration file does not exist, use \"weatherbird set\" to generate configuration");}
     }
     let toml_in = fs::read_to_string(strpath).expect("Error reading configuration");
     let tomlstr: TomlInfo = toml::de::from_str(&toml_in).expect("Error parsing configuration file");

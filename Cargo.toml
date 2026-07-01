@@ -1,5 +1,5 @@
 [package]
-name = "duck"
+name = "weatherbird"
 version = "0.3.2"
 edition = "2024"
 
@@ -14,3 +14,4 @@ strip = true  # Automatically strip symbols from the binary.
 opt-level = "z"
 lto = true
 codegen-units = 1
+panic = "abort"
