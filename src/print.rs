@@ -3,8 +3,8 @@ pub fn print_weather(code: u8, day: u8) {
         match code {
             0 => {
                 println!("\r|-------------------------|");
-                println!("|     \\      |       /    |");
-                println!("|      \\     |      /     |");
+                println!("|     \\       |      /    |");
+                println!("|      \\      |     /     |");
                 println!("|       ------------      |");
                 println!("|      /            \\     |");
                 println!("|  ___|              |___ |");
