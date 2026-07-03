@@ -30,7 +30,7 @@ struct Daily {
     time: Vec<String>
 }
 
-const VERSION: &str = "v0.4.0";
+const VERSION: &str = "v0.4.1";
 
 #[tokio::main]
 async fn main() {
@@ -123,7 +123,7 @@ fn error(message: &str) {
 fn set() -> (String, String) { 
     let mut lat = String::new();
     let mut long = String::new();
-    println!("Duck location setup");
+    println!("Weatherbird location setup");
     print!("Latitude: ");
     std::io::stdout().flush().expect("Error flushing output");
     std::io::stdin().read_line(&mut lat).expect("Error reading user input");

@@ -19,7 +19,7 @@ pub fn write_conf(lat: String, long: String) {
             let path = std::path::Path::new(&strpath);
             let prefix = path.parent().expect("Fatal error in write_conf()");
             std::fs::create_dir_all(prefix).expect("Error creating directory");
-            fs::File::create(&strpath).expect("Error creating duck.toml");
+            fs::File::create(&strpath).expect("Error creating weatherbird.toml");
         }
     }
     let tomlstr = TomlInfo {
