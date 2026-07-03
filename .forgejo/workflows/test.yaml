@@ -1,0 +1,14 @@
+name: Rust test
+
+on:
+  pull:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout  # Clone git repository
+          uses: actions/checkout@v3
+          uses: https://github.com/actions/dtolnay/rust-toolchain@stable
