@@ -13,6 +13,6 @@ jobs:
         - name: Checkout  # Clone git repository
           uses: actions/checkout@v3
         - name: Install Rust toolchain
-          uses: https://github.com/actions/dtolnay/rust-toolchain@stable
+          uses: https://github.com/dtolnay/rust-toolchain@stable
         - name: Check that code can compile
           run: cargo check
