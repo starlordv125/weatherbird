@@ -148,7 +148,7 @@ async fn meteo_get() -> Obj {
     print!("Fetching weather...");
     std::io::stdout().flush().expect("Error flushing output");
     let conf: conf::TomlInfo = conf::read_conf();
-    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + &conf.long.as_str() + "&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch";
+    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + &conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch";
     let response = reqwest::Client::new()
     .get(&link)
     .send()

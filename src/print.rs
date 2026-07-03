@@ -41,9 +41,9 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("|   |    |            *   |");
                 println!("|   |  o |                |");
                 println!("|   |    |                |");
-                println!("|   \\o   \\ *  _           |");
-                println!("|    \\  O \\ _/ /          |");
-                println!("|  *  \\_______/    *      |");
+                println!("|   \\o   \\ * __           |");
+                println!("|    \\  O \\_/ /           |");
+                println!("|  *  \\______/     *      |");
                 println!("|-------------------------|");
                 println!("Starry")
             }
