@@ -45,6 +45,7 @@ jobs:
         - name: Upload binary to releases
         # on release 5
           run: |
+            pwd
             curl -X 'POST' \
             'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/5/assets?name=weatherbird-linux-amd64' \
             -H 'accept: application/json' \
