@@ -42,10 +42,11 @@ jobs:
               "tag_name": "v0.4.2",
               "target_commitish": "actions"
             }'
-        - name: Upload binary to release
+        - name: Upload binary to releases
+        # on release 4
           run: |
             curl -X 'POST' \
-            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/3/assets?name=weatherbird-linux-amd64' \
+            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/4/assets?name=weatherbird-linux-amd64' \
             -H 'accept: application/json' \
             -H 'authorization: token ${{ secrets.API_KEY }}' \
             -H 'Content-Type: multipart/form-data' \
