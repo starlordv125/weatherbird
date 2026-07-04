@@ -20,9 +20,6 @@ jobs:
           run: cargo build --release
         - name: Create tar archive
           run: |
-            pwd
-            ls
-            ls package/
             mkdir package
             mkdir package/weatherbird-linux-amd64
             cp target/release/weatherbird package/weatherbird-linux-amd64
