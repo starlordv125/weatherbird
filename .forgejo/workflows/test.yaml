@@ -20,12 +20,15 @@ jobs:
           run: cargo build --release
         - name: Create tar archive
           run: |
+            pwd
+            ls
+            ls package/
             mkdir package
             mkdir package/weatherbird-linux-amd64
             cp target/release/weatherbird package/weatherbird-linux-amd64
             cp LICENSE package/weatherbird-linux-amd64
             cp README.md package/weatherbird-linux-amd64
-            tar -czvf weatherbird-linux-amd64.tar.zstd package/weatherbird-linux-amd64
+            tar -czvf package/weatherbird-linux-amd64.tar.zstd package/weatherbird-linux-amd64
         - name: Create release
           run: |
             curl -X 'POST' \
@@ -45,7 +48,6 @@ jobs:
         - name: Upload binary to releases
         # on release 5
           run: |
-            pwd
             curl -X 'POST' \
             'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/5/assets?name=weatherbird-linux-amd64' \
             -H 'accept: application/json' \
