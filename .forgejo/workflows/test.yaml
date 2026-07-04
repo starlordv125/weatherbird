@@ -37,7 +37,7 @@ jobs:
               "body": "Test release!!",
               "draft": false,
               "hide_archive_links": false,
-              "name": "v0.4.2",
+              "name": "test for actions",
               "prerelease": false,
               "tag_name": "v0.4.2",
               "target_commitish": "actions"
