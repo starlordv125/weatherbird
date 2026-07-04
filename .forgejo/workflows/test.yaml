@@ -18,3 +18,27 @@ jobs:
           run: cargo check
         - name: Build Rust binary
           run: cargo build --release
+        - name: Create tar archive
+          run: |
+            mkdir package
+            mkdir package/weatherbird-linux-amd64
+            cp target/release/weatherbird package/weatherbird-linux-amd64
+            cp LICENSE package/weatherbird-linux-amd64
+            cp README.md package/weatherbird-linux-amd64
+            tar --zstd -cvf weatherbird-linux-amd64.tar.zstd package/weatherbird-linux-amd64
+        - name: Create release
+          run: |
+            curl -X 'POST' \
+              'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases' \
+              -H 'accept: application/json' \
+              -H 'Authorization: token 456f222fdb43834e770526bf333b57df9e1e0161' \
+              -H 'Content-Type: application/json' \
+              -d '{
+              "body": "Test release!!",
+              "draft": false,
+              "hide_archive_links": false,
+              "name": "v0.4.2",
+              "prerelease": false,
+              "tag_name": "v0.4.2",
+              "target_commitish": "actions"
+            }'
