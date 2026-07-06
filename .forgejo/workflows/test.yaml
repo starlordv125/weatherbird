@@ -3,7 +3,7 @@ name: Rust test
 on:
   push:
     branches:
-      - actions
+      - main
 
 #test1
 jobs:
@@ -34,19 +34,19 @@ jobs:
               -H 'Authorization: token ${{ secrets.API_KEY }}' \
               -H 'Content-Type: application/json' \
               -d '{
-              "body": "Test release!!",
+              "body": "This release offers small improvements to the program, and now a CI pipeline is completed for development.",
               "draft": false,
               "hide_archive_links": false,
-              "name": "test for actions",
+              "name": "v0.4.2",
               "prerelease": false,
               "tag_name": "v0.4.2",
-              "target_commitish": "actions"
+              "target_commitish": "main"
             }'
         - name: Upload binary to releases
         # on release 5
           run: |
             curl -X 'POST' \
-            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/5/assets?name=weatherbird-linux-amd64' \
+            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/5/assets?name=weatherbird-linux-amd64.tar.gz' \
             -H 'accept: application/json' \
             -H 'authorization: token ${{ secrets.API_KEY }}' \
             -H 'Content-Type: multipart/form-data' \
