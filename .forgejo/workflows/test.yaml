@@ -25,10 +25,7 @@ jobs:
             cp target/release/weatherbird package/weatherbird-linux-amd64
             cp LICENSE package/weatherbird-linux-amd64
             cp README.md package/weatherbird-linux-amd64
-            tar -czvf package/weatherbird-linux-amd64.tar.zstd package/weatherbird-linux-amd64
-            ls
-            ls package/
-            pwd
+            tar -czvf package/weatherbird-linux-amd64.tar.gz package/weatherbird-linux-amd64
         - name: Create release
           run: |
             curl -X 'POST' \
@@ -53,4 +50,4 @@ jobs:
             -H 'accept: application/json' \
             -H 'authorization: token ${{ secrets.API_KEY }}' \
             -H 'Content-Type: multipart/form-data' \
-            -F 'attachment=@package/weatherbird-linux-amd64.tar.gz;type=text/x-dsrc'
+            -F 'attachment=@./package/weatherbird-linux-amd64.tar.gz;type=text/x-dsrc'
