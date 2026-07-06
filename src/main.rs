@@ -30,7 +30,7 @@ struct Daily {
     time: Vec<String>
 }
 
-const VERSION: &str = "v0.4.1";
+const VERSION: &str = "v0.4.2";
 
 #[tokio::main]
 async fn main() {
