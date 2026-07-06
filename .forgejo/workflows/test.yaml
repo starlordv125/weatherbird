@@ -26,6 +26,9 @@ jobs:
             cp LICENSE package/weatherbird-linux-amd64
             cp README.md package/weatherbird-linux-amd64
             tar -czvf package/weatherbird-linux-amd64.tar.zstd package/weatherbird-linux-amd64
+            ls
+            ls package/
+            pwd
         - name: Create release
           run: |
             curl -X 'POST' \
