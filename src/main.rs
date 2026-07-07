@@ -30,7 +30,7 @@ struct Daily {
     time: Vec<String>
 }
 
-const VERSION: &str = "v0.4.2";
+const VERSION: &str = "v0.4.3";
 
 #[tokio::main]
 async fn main() {
@@ -83,8 +83,8 @@ fn collect_args() -> ArgInfo {
                 match arg.as_str() {
                 "set" => {info.set = true}
                 "days" => {days_next = true}
-                "--version" => {println!("{}", VERSION);std::process::exit(0)}
-                "--help" => {help()}
+                "--version" | "-v" => {println!("{}", VERSION);std::process::exit(0)}
+                "--help" | "-h" => {help()}
                 _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
                 }
             }
@@ -104,8 +104,8 @@ fn help() {
     println!("This is free software, and you are welcome to redistribute it under certain conditions");
     println!("--------------------------------------------------------------------------------------");
     println!("Arguements");
-    println!("--help -> Displays this menu");
-    println!("--version -> Shows version number");
+    println!("--help or -h -> Displays this menu");
+    println!("--version or -v -> Shows version number");
     println!("set -> Allows you to set coordinates, will overwrite previous configuration");
     println!("days [1-7] -> Shows a forecast of up to seven days");
     println!("--------------------------------------------------------------------------------------");
@@ -177,8 +177,8 @@ fn forecast(daily_info: Daily, days: usize) {
             95 => {"Stormy"}
             96 | 99 => {"Hail"}
             _ => {"Unknown"}
-        }
-    )
+            }
+        )
     }
     for num in 0..days {
         println!("\r-------------------");

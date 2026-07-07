@@ -34,19 +34,19 @@ jobs:
               -H 'Authorization: token ${{ secrets.API_KEY }}' \
               -H 'Content-Type: application/json' \
               -d '{
-              "body": "This release offers small improvements to the program, and now a CI pipeline is completed for development.",
+              "body": "Small code cleanup, added `-h` and `-v` arguements",
               "draft": false,
               "hide_archive_links": false,
-              "name": "v0.4.2",
+              "name": "v0.4.3",
               "prerelease": false,
-              "tag_name": "v0.4.2",
+              "tag_name": "v0.4.3",
               "target_commitish": "main"
             }'
         - name: Upload binary to releases
-        # on release 5
+        # on release 6
           run: |
             curl -X 'POST' \
-            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/5/assets?name=weatherbird-linux-amd64.tar.gz' \
+            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/6/assets?name=weatherbird-linux-amd64.tar.gz' \
             -H 'accept: application/json' \
             -H 'authorization: token ${{ secrets.API_KEY }}' \
             -H 'Content-Type: multipart/form-data' \
