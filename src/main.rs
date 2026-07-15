@@ -6,6 +6,7 @@ mod conf;
 struct ArgInfo {
     days: usize,
     forecast: bool,
+    hours: bool,
     set: bool,
 }
 
@@ -48,6 +49,9 @@ async fn main() {
         forecast(json.daily, info.days);
         std::process::exit(0);
     }
+    if info.hours == true {
+        //hours()
+    }
     let code = json.current.weather_code;
     let is_day = json.current.is_day;
     print::print_weather(code, is_day);
@@ -62,7 +66,8 @@ fn collect_args() -> ArgInfo {
     let mut info = ArgInfo {
         days: 7,
         set: false,
-        forecast: false
+        forecast: false,
+        hours: false,
     };
     for arg in &args[1..] {
         match days_next {
@@ -83,6 +88,7 @@ fn collect_args() -> ArgInfo {
                 match arg.as_str() {
                 "set" => {info.set = true}
                 "days" => {days_next = true}
+                "hours" => {}
                 "--version" | "-v" => {println!("{}", VERSION);std::process::exit(0)}
                 "--help" | "-h" => {help()}
                 _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
@@ -148,7 +154,7 @@ async fn meteo_get() -> Obj {
     print!("Fetching weather...");
     std::io::stdout().flush().expect("Error flushing output");
     let conf: conf::TomlInfo = conf::read_conf();
-    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + &conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch";
+    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch";
     let response = reqwest::Client::new()
     .get(&link)
     .send()
@@ -161,9 +167,25 @@ async fn meteo_get() -> Obj {
 }
 
 fn forecast(daily_info: Daily, days: usize) {
-    let mut weather_codes: Vec<&str> = Vec::new();
+    let weather_codes = code_alloc(daily_info.weather_code, days);
     for num in 0..days {
-        weather_codes.push(match daily_info.weather_code[num] {
+        println!("\r-------------------");
+        println!("Date: {}", daily_info.time[num]);
+        println!("Weather: {}", weather_codes[num]);
+        println!("Max temp: {}", daily_info.temperature_2m_max[num]);
+        println!("Min temp: {}", daily_info.temperature_2m_min[num]);
+    }
+    println!("-------------------");
+}
+/*
+fn forecast_hourly() {
+    
+}
+*/
+fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
+    let mut weathers: Vec<String> = Vec::new();
+    for num in 0..size {
+        weathers.push((match codes[num] {
             0 => {"Clear"}
             1 | 2 => {"Partly cloudy"}
             3 => {"Overcast"}
@@ -178,14 +200,7 @@ fn forecast(daily_info: Daily, days: usize) {
             96 | 99 => {"Hail"}
             _ => {"Unknown"}
             }
-        )
+        ).to_string())
     }
-    for num in 0..days {
-        println!("\r-------------------");
-        println!("Date: {}", daily_info.time[num]);
-        println!("Weather: {}", weather_codes[num]);
-        println!("Max temp: {}", daily_info.temperature_2m_max[num]);
-        println!("Min temp: {}", daily_info.temperature_2m_min[num]);
-    }
-    println!("-------------------")
+    return weathers;
 }
