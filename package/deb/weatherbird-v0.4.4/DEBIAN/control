@@ -1,0 +1,10 @@
+Source: weatherbird
+Section: net
+Priority: optional
+Maintainer: Cameron Reynolds <cameron@starlordv125.net>
+Homepage: https://forgejo.starlordv125.net/starlordv125/weatherbird
+Package: weatherbird
+Version: 0.4.4-1+trixie
+Architecture: amd64
+Depends: 
+Description: A simple weather program written in Rust.
