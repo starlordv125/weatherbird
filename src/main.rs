@@ -115,7 +115,7 @@ fn help() {
     println!("set -> Allows you to set coordinates, will overwrite previous configuration");
     println!("days [1-7] -> Shows a forecast of up to seven days");
     println!("--------------------------------------------------------------------------------------");
-    println!("Repo: https://forgejo.starlordv125.net/starlordv125/duck");
+    println!("Repo: https://forgejo.starlordv125.net/starlordv125/weatherbird");
     println!("Maintainer email: cameron@starlordv125.net");
     std::process::exit(0); // change later
 }
