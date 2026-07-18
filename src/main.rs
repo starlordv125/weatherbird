@@ -1,9 +1,10 @@
 // Weatherbird (C) Cameron Reynolds <cameron@starlordv125.net> 2026
 // A simple CLI based weather program
 
-use std::{env, io::Write};
+use std::{env, io::Write, time::{SystemTime, UNIX_EPOCH}};
 use serde::Deserialize;
 use std::time;
+use chrono;
 
 mod print;
 mod conf;
@@ -53,9 +54,10 @@ const VERSION: &str = "v0.4.4";
 // Tokio is needed for Reqwest, which is needed to interact with openmeteo API
 #[tokio::main]
 async fn main() {
-    let current_time = time::SystemTime::now();
-    println!("{:?}", current_time); // debug
-    println!("{:?}", time::UNIX_EPOCH); //debug
+    let time_now = chrono::Utc::now();
+    println!("{}", time_now);
+    //println!("{:?}", current_time); // debug
+    //println!("{:?}", time::UNIX_EPOCH); //debug
     let info: ArgInfo = collect_args();
     // Checks if multiple arguements are passed
     if info.set == true && info.forecast == true {
@@ -242,3 +244,4 @@ fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
     }
     return weathers;
 }
+
