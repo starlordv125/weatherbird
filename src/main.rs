@@ -73,11 +73,15 @@ async fn main() {
         forecast_hourly(json.hourly, info.num);
         std::process::exit(0);
     }
-    let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).await;
     if info.forecast == true {
+        if info.num > 7 || info.num < 1 {
+            error("Day out of range");
+        }
+        let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).await;
         forecast(json.daily, info.num);
         std::process::exit(0);
     }
+    let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).await;
     let code = json.current.weather_code;
     let is_day = json.current.is_day;
     print::print_weather(code, is_day);
@@ -230,7 +234,7 @@ fn forecast_hourly(hourly_info: Hourly, hours: usize) {
     let hour_index_end: usize = hour_index + hours;
     let weather_codes: Vec<String> = code_alloc(hourly_info.weather_code, hour_index_end);
     for num in hour_index..hour_index_end {
-        println!("-------------------");
+        println!("\r-------------------");
         println!("Hour: {}", NaiveDateTime::parse_from_str(&hourly_info.time[num], "%Y-%m-%dT%H:%M").unwrap().hour());
         println!("Temp: {}", hourly_info.temperature_2m[num]);
         println!("Weather: {}", weather_codes[num]);
