@@ -1,10 +1,9 @@
 // Weatherbird (C) Cameron Reynolds <cameron@starlordv125.net> 2026
 // A simple CLI based weather program
 
-use std::{env, io::Write, time::{SystemTime, UNIX_EPOCH}};
+use std::{env, io::Write};
 use serde::Deserialize;
-use std::time;
-use chrono;
+use chrono::{self, NaiveDateTime, Timelike};
 
 mod print;
 mod conf;
@@ -30,34 +29,32 @@ struct Obj {
 #[derive(Deserialize)]
 struct JsonInfo {
     weather_code: u8,
-    temperature_2m: f64,
+    temperature_2m: f32,
     is_day: u8
 }
 
 // Daily weather data
 #[derive(Deserialize)]
 struct Daily {
-    temperature_2m_max: Vec<f64>,
-    temperature_2m_min: Vec<f64>,
+    temperature_2m_max: Vec<f32>,
+    temperature_2m_min: Vec<f32>,
     weather_code: Vec<u8>,
     time: Vec<String>
 }
 
 #[derive(Deserialize)]
 struct Hourly {
-
+    time: Vec<String>,
+    temperature_2m: Vec<f32>,
+    weather_code: Vec<u8>
 }
 
 // Change this when moving to a new version
-const VERSION: &str = "v0.4.4";
+const VERSION: &str = "v0.5.0";
 
 // Tokio is needed for Reqwest, which is needed to interact with openmeteo API
 #[tokio::main]
 async fn main() {
-    let time_now = chrono::Utc::now();
-    println!("{}", time_now);
-    //println!("{:?}", current_time); // debug
-    //println!("{:?}", time::UNIX_EPOCH); //debug
     let info: ArgInfo = collect_args();
     // Checks if multiple arguements are passed
     if info.set == true && info.forecast == true {
@@ -68,13 +65,18 @@ async fn main() {
         conf::write_conf(lat, long);
         std::process::exit(0);
     }
+    if info.hours == true {
+        if info.num > 24 || info.num < 1 {
+            error("Hour out of range");
+        }
+        let json: Obj = meteo_get(2).await;
+        forecast_hourly(json.hourly, info.num);
+        std::process::exit(0);
+    }
     let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).await;
     if info.forecast == true {
         forecast(json.daily, info.num);
         std::process::exit(0);
-    }
-    if info.hours == true {
-        //hours(json.hourly, info.num)
     }
     let code = json.current.weather_code;
     let is_day = json.current.is_day;
@@ -136,6 +138,7 @@ fn help() {
     println!("|--version or -v -> Shows version number                                               |");
     println!("|set -> Allows you to set coordinates, will overwrite previous configuration           |");
     println!("|days [1-7] -> Shows a forecast of up to seven days                                    |");
+    println!("|hours [1-24] -> Shows a forecast of up to twenty-four hours                           |");
     println!("|--------------------------------------------------------------------------------------|");
     println!("|Repo: https://forgejo.starlordv125.net/starlordv125/weatherbird                       |");
     println!("|Maintainer email: cameron@starlordv125.net                                            |");
@@ -213,12 +216,28 @@ fn forecast(daily_info: Daily, days: usize) {
     }
     println!("-------------------");
 }
-/*
+
+// Need to find which hour is current hour in vector
 fn forecast_hourly(hourly_info: Hourly, hours: usize) {
-    let current_time = time::SystemTime::now();
-    let weather_codes = code_alloc(hourly_info.)
+    let local_time = chrono::Local::now();
+    let mut hour_index: usize = 0;
+    for hour in &hourly_info.time {
+        if NaiveDateTime::parse_from_str(&hour, "%Y-%m-%dT%H:%M").unwrap().hour() == local_time.hour() {
+            break;
+        }
+        hour_index += 1;
+    }
+    let hour_index_end: usize = hour_index + hours;
+    let weather_codes: Vec<String> = code_alloc(hourly_info.weather_code, hour_index_end);
+    for num in hour_index..hour_index_end {
+        println!("-------------------");
+        println!("Hour: {}", NaiveDateTime::parse_from_str(&hourly_info.time[num], "%Y-%m-%dT%H:%M").unwrap().hour());
+        println!("Temp: {}", hourly_info.temperature_2m[num]);
+        println!("Weather: {}", weather_codes[num]);
+    }
+    println!("-------------------");
 }
-*/
+
 
 // Used for both forecast() and forecast_hourly(), this converts weather codes
 // into corresponding descriptions of the weather

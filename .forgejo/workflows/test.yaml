@@ -17,9 +17,9 @@ jobs:
         # CHANGE THESE WHEN PUSHING TO MAIN
         # +1 to RELEASE
           run: |
-            export VERSION="v0.4.3"
-            export MESSAGE=""
-            export RELEASE=6
+            export VERSION="v0.5.0"
+            export MESSAGE="This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
+            export RELEASE=7
         - name: Build Rust binary
           run: cargo build --release
         - name: Create tar archive
@@ -54,3 +54,27 @@ jobs:
             -H 'authorization: token ${{ secrets.API_KEY }}' \
             -H 'Content-Type: multipart/form-data' \
             -F 'attachment=@./package/weatherbird-linux-amd64.tar.gz;type=text/x-dsrc'
+        - name: Update Debian package repository
+          run: |
+            apt install dpkg -y
+            mkdir -p package/deb/weatherbird/DEBIAN/
+            touch package/deb/weatherbird/DEBIAN/control
+            echo "Source: weatherbird
+            Section: main
+            Priority: optional
+            Maintainer: Cameron Reynolds <cameron@starlordv125.net>
+            Homepage: https://forgejo.starlordv125.net/starlordv125/weatherbird
+            Package: weatherbird
+            Version: $VERSION-1
+            Architecture: amd64
+            Depends: 
+            Description: A simple weather program written in Rust.
+            Distribution: trixie
+            Component: main" >> package/deb/weatherbird/DEBIAN/control
+            mkdir -p package/deb/weatherbird/usr/bin
+            cp target/release/weatherbird package/deb/weatherbird/usr/bin
+            cd package/deb
+            dpkg-deb --root-owner-group --build weatherbird
+            curl --user starlordv125:${{ secrets.API_KEY }} \
+            --upload-file ./weatherbird.deb \
+            https://forgejo.starlordv125.net/api/packages/starlordv125/debian/pool/trixie/main/upload
