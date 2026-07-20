@@ -8,18 +8,17 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
+    env:
+    # CHANGE THESE WHEN PUSHING TO MAIN
+    # +1 to RELEASE
+      VERSION: "v0.5.0"
+      MESSAGE: "This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
+      RELEASE: 7
     steps:
         - name: Checkout  # Clone git repository
           uses: actions/checkout@v3
         - name: Install Rust toolchain
           uses: https://github.com/dtolnay/rust-toolchain@stable
-        - name: Export variables
-        # CHANGE THESE WHEN PUSHING TO MAIN
-        # +1 to RELEASE
-          run: |
-            export VERSION="v0.5.0"
-            export MESSAGE="This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
-            export RELEASE=7
         - name: Build Rust binary
           run: cargo build --release
         - name: Create tar archive
