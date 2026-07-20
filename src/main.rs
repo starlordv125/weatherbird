@@ -123,7 +123,7 @@ fn collect_args() -> ArgInfo {
         }
     }
     match num_next {
-        true => {error("Number of days not specified");}
+        true => {error("Number not specified");}
         false => {}
     }
     return info
@@ -145,7 +145,7 @@ fn help() {
     println!("|hours [1-24] -> Shows a forecast of up to twenty-four hours                           |");
     println!("|--------------------------------------------------------------------------------------|");
     println!("|Repo: https://forgejo.starlordv125.net/starlordv125/weatherbird                       |");
-    println!("|Maintainer email: cameron@starlordv125.net                                            |");
+    println!("|Maintainer email: <cameron@starlordv125.net>                                          |");
     println!("|--------------------------------------------------------------------------------------|");
     std::process::exit(0); // change later
 }
