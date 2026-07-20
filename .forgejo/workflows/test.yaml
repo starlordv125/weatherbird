@@ -11,8 +11,8 @@ jobs:
     env:
     # CHANGE THESE WHEN PUSHING TO MAIN
     # +1 to RELEASE
-      VERSION: "'0.5.0'"
-      MESSAGE: "'This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours.'"
+      VERSION: "0.5.0"
+      MESSAGE: "This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
       RELEASE: 7
     steps:
         - name: Checkout  # Clone git repository
@@ -37,12 +37,12 @@ jobs:
               -H 'Authorization: token ${{ secrets.API_KEY }}' \
               -H 'Content-Type: application/json' \
               -d '{
-              "body": ${{ env.MESSAGE }},
+              "body": "${{ env.MESSAGE }}",
               "draft": false,
               "hide_archive_links": false,
-              "name": v${{ env.VERSION }},
+              "name": "v${{ env.VERSION }}",
               "prerelease": false,
-              "tag_name": v${{ env.VERSION }},
+              "tag_name": "v${{ env.VERSION }}",
               "target_commitish": "main"
             }'
         - name: Upload binary package to releases
