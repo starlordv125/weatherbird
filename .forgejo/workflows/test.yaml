@@ -11,7 +11,7 @@ jobs:
     env:
     # CHANGE THESE WHEN PUSHING TO MAIN
     # +1 to RELEASE
-      VERSION: "v0.5.0"
+      VERSION: "0.5.0"
       MESSAGE: "This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
       RELEASE: 7
     steps:
@@ -37,18 +37,18 @@ jobs:
               -H 'Authorization: token ${{ secrets.API_KEY }}' \
               -H 'Content-Type: application/json' \
               -d '{
-              "body": $MESSAGE,
+              "body": ${{ env.MESSAGE }},
               "draft": false,
               "hide_archive_links": false,
-              "name": $VERSION,
+              "name": v${{ env.VERSION }},
               "prerelease": false,
-              "tag_name": $VERSION,
+              "tag_name": v${{ env.VERSION }},
               "target_commitish": "main"
             }'
         - name: Upload binary package to releases
           run: |
             curl -X 'POST' \
-            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/$RELEASE/assets?name=weatherbird-linux-amd64.tar.gz' \
+            'https://forgejo.starlordv125.net/api/v1/repos/starlordv125/weatherbird/releases/${{ env.RELEASE }}/assets?name=weatherbird-linux-amd64.tar.gz' \
             -H 'accept: application/json' \
             -H 'authorization: token ${{ secrets.API_KEY }}' \
             -H 'Content-Type: multipart/form-data' \
@@ -64,7 +64,7 @@ jobs:
             Maintainer: Cameron Reynolds <cameron@starlordv125.net>
             Homepage: https://forgejo.starlordv125.net/starlordv125/weatherbird
             Package: weatherbird
-            Version: $VERSION-1
+            Version: ${{ env.VERSION }}-1
             Architecture: amd64
             Depends: 
             Description: A simple weather program written in Rust.
