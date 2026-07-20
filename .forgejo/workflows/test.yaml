@@ -11,8 +11,8 @@ jobs:
     env:
     # CHANGE THESE WHEN PUSHING TO MAIN
     # +1 to RELEASE
-      VERSION: "0.5.0"
-      MESSAGE: "This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
+      VERSION: "'0.5.0'"
+      MESSAGE: "'This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours.'"
       RELEASE: 7
     steps:
         - name: Checkout  # Clone git repository
@@ -73,6 +73,7 @@ jobs:
             mkdir -p package/deb/weatherbird/usr/bin
             cp target/release/weatherbird package/deb/weatherbird/usr/bin
             cd package/deb
+            chmod -R 755 weatherbird
             dpkg-deb --root-owner-group --build weatherbird
             curl --user starlordv125:${{ secrets.API_KEY }} \
             --upload-file ./weatherbird.deb \
