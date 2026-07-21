@@ -11,7 +11,7 @@ jobs:
     env:
     # CHANGE THESE WHEN PUSHING TO MAIN
     # +1 to RELEASE
-      VERSION: "0.5.0"
+      VERSION: "0.5.0-2"
       MESSAGE: "This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
       RELEASE: 7
     steps:
@@ -57,6 +57,7 @@ jobs:
           run: |
             apt install dpkg -y
             mkdir -p package/deb/weatherbird/DEBIAN/
+            mkdir -p package/deb/weatherbird/usr/share/bash-completion/completions/
             touch package/deb/weatherbird/DEBIAN/control
             echo "Source: weatherbird
             Section: main
@@ -64,12 +65,19 @@ jobs:
             Maintainer: Cameron Reynolds <cameron@starlordv125.net>
             Homepage: https://forgejo.starlordv125.net/starlordv125/weatherbird
             Package: weatherbird
-            Version: ${{ env.VERSION }}-1
+            Version: ${{ env.VERSION }}
             Architecture: amd64
             Depends: 
             Description: A simple weather program written in Rust.
             Distribution: trixie
             Component: main" >> package/deb/weatherbird/DEBIAN/control
+            echo "#!/bin/bash
+
+            _Weatherbird() {
+            local cur
+            cur="${COMP_WORDS[COMP_CWORD]}"
+            COMPREPLY=( $(compgen -W "set days hours --help --version" -- "$cur") )
+            }" >> package/deb/weatherbird/usr/share/bash-completion/completions/weatherbird
             mkdir -p package/deb/weatherbird/usr/bin
             cp target/release/weatherbird package/deb/weatherbird/usr/bin
             cd package/deb
