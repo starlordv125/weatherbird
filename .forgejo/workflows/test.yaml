@@ -11,7 +11,7 @@ jobs:
     env:
     # CHANGE THESE WHEN PUSHING TO MAIN
     # +1 to RELEASE
-      VERSION: "0.5.0-2"
+      VERSION: "0.5.0-3"
       MESSAGE: "Small release, adds bash autocompletion to debian package"
       RELEASE: 8
     steps:
@@ -75,8 +75,8 @@ jobs:
 
             _Weatherbird() {
             local cur
-            cur="${COMP_WORDS[COMP_CWORD]}"
-            COMPREPLY=( $(compgen -W "set days hours --help --version" -- "$cur") )
+            cur='${COMP_WORDS[COMP_CWORD]}'
+            COMPREPLY=( '$(compgen -W "set days hours --help --version" -- "$cur")' )
             }" >> package/deb/weatherbird/usr/share/bash-completion/completions/weatherbird
             mkdir -p package/deb/weatherbird/usr/bin
             cp target/release/weatherbird package/deb/weatherbird/usr/bin
