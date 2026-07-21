@@ -12,8 +12,8 @@ jobs:
     # CHANGE THESE WHEN PUSHING TO MAIN
     # +1 to RELEASE
       VERSION: "0.5.0-2"
-      MESSAGE: "This release introduces the `hour` arguement. You can now pass `hour [1-24]` to get a forecast of the specified amount of hours."
-      RELEASE: 7
+      MESSAGE: "Small release, adds bash autocompletion to debian package"
+      RELEASE: 8
     steps:
         - name: Checkout  # Clone git repository
           uses: actions/checkout@v3
