@@ -50,7 +50,7 @@ struct Hourly {
 }
 
 // Change this when moving to a new version
-const VERSION: &str = "v0.5.0-4";
+const VERSION: &str = "v0.5.0-5";
 
 // Tokio is needed for Reqwest, which is needed to interact with openmeteo API
 #[tokio::main]
