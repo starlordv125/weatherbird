@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
     # CHANGE THESE WHEN PUSHING TO MAIN
-    # +1 to RELEASE
-      VERSION: "0.5.0-3"
+    # +1 to RELEASE temp
+      VERSION: "0.5.0-4"
       MESSAGE: "Small release, adds bash autocompletion to debian package"
-      RELEASE: 8
+      RELEASE: 10
     steps:
         - name: Checkout  # Clone git repository
           uses: actions/checkout@v3
@@ -71,13 +71,13 @@ jobs:
             Description: A simple weather program written in Rust.
             Distribution: trixie
             Component: main" >> package/deb/weatherbird/DEBIAN/control
-            echo "#!/bin/bash
+            echo '#!/bin/bash
 
             _Weatherbird() {
             local cur
-            cur='${COMP_WORDS[COMP_CWORD]}'
-            COMPREPLY=( '$(compgen -W "set days hours --help --version" -- "$cur")' )
-            }" >> package/deb/weatherbird/usr/share/bash-completion/completions/weatherbird
+            cur=${COMP_WORDS[COMP_CWORD]}
+            COMPREPLY=( $(compgen -W "set days hours --help --version" -- "$cur") )
+            }' >> package/deb/weatherbird/usr/share/bash-completion/completions/weatherbird
             mkdir -p package/deb/weatherbird/usr/bin
             cp target/release/weatherbird package/deb/weatherbird/usr/bin
             cd package/deb
