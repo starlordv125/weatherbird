@@ -11,9 +11,9 @@ jobs:
     env:
     # CHANGE THESE WHEN PUSHING TO MAIN
     # +1 to RELEASE temp
-      VERSION: "0.5.0-5"
-      MESSAGE: "Small release, adds bash autocompletion to debian package"
-      RELEASE: 11
+      VERSION: "0.5.1"
+      MESSAGE: "This release switches from reqwest, which needed an async runtime to ureq. This decreases the binary size by about two megabytes. This release also handles network connection errors more gracefully."
+      RELEASE: 12
     steps:
         - name: Checkout  # Clone git repository
           uses: actions/checkout@v3
@@ -28,7 +28,9 @@ jobs:
             cp target/release/weatherbird package/weatherbird-linux-amd64
             cp LICENSE package/weatherbird-linux-amd64
             cp README.md package/weatherbird-linux-amd64
-            tar -czvf package/weatherbird-linux-amd64.tar.gz package/weatherbird-linux-amd64
+            cd package
+            tar -czvf ./weatherbird-linux-amd64.tar.gz ./weatherbird-linux-amd64
+            cd ../
         - name: Create release
           run: |
             curl -X 'POST' \
@@ -65,7 +67,7 @@ jobs:
             Maintainer: Cameron Reynolds <cameron@starlordv125.net>
             Homepage: https://forgejo.starlordv125.net/starlordv125/weatherbird
             Package: weatherbird
-            Version: ${{ env.VERSION }}
+            Version: ${{ env.VERSION }}-1
             Architecture: amd64
             Depends: 
             Description: A simple weather program written in Rust.
