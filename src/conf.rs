@@ -37,7 +37,7 @@ pub fn read_conf() -> TomlInfo {
     let strpath = home + "/.config/weatherbird/weatherbird.toml";
     match fs::metadata(&strpath) {
         Ok(_) => {},
-        Err(_) => {crate::error("Configuration file does not exist, use \"weatherbird set\" to generate configuration");}
+        Err(_) => {crate::error("\rConfiguration file does not exist, use \"weatherbird set\" to generate configuration");}
     }
     let toml_in = fs::read_to_string(strpath).expect("Error reading configuration");
     let tomlstr: TomlInfo = toml::de::from_str(&toml_in).expect("Error parsing configuration file");
