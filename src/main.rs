@@ -4,6 +4,7 @@
 use std::{env, io::Write};
 use serde::Deserialize;
 use chrono::{self, NaiveDateTime, Timelike};
+use ureq;
 
 mod print;
 mod conf;
@@ -50,11 +51,9 @@ struct Hourly {
 }
 
 // Change this when moving to a new version
-const VERSION: &str = "v0.5.0-5";
+const VERSION: &str = "v0.5.1";
 
-// Tokio is needed for Reqwest, which is needed to interact with openmeteo API
-#[tokio::main]
-async fn main() {
+fn main() {
     let info: ArgInfo = collect_args();
     // Checks if multiple arguements are passed
     if info.set == true && info.forecast == true {
@@ -69,7 +68,7 @@ async fn main() {
         if info.num > 24 || info.num < 1 {
             error("Hour out of range");
         }
-        let json: Obj = meteo_get(2).await;
+        let json: Obj = meteo_get(2).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
         forecast_hourly(json.hourly, info.num);
         std::process::exit(0);
     }
@@ -77,11 +76,11 @@ async fn main() {
         if info.num > 7 || info.num < 1 {
             error("Day out of range");
         }
-        let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).await;
+        let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
         forecast(json.daily, info.num);
         std::process::exit(0);
     }
-    let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).await;
+    let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
     let code = json.current.weather_code;
     let is_day = json.current.is_day;
     print::print_weather(code, is_day);
@@ -189,21 +188,16 @@ fn input_error_check(num: &str) {
 // For now it's just one big URL that gets all of the data possibly needed for the program,
 // that can be changed in the future
 // TODO: Allow for metric units
-async fn meteo_get(days: u8) -> Obj {
+fn meteo_get(days: u8) -> Result<Obj, ureq::Error> {
     print!("Fetching weather...");
     let days: String = days.to_string();
     std::io::stdout().flush().expect("Error flushing output");
     let conf: conf::TomlInfo = conf::read_conf();
     let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&hourly=temperature_2m,weather_code&forecast_days=" + &days;
-    let response = reqwest::Client::new()
-    .get(&link)
-    .send()
-    .await
-    .expect("Error connecting to openmeteo")
-    // .json uses serde::json
-    .json::<Obj>()
-    .await
-    .expect("Error parsing JSON");
+    let response = ureq::get(link)
+    .call()?
+    .body_mut()
+    .read_json::<Obj>();
     return response
 }
 
