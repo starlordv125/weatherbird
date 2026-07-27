@@ -131,7 +131,7 @@ fn collect_args() -> ArgInfo {
 // Help menu when "-h" or "--help" is passed
 fn help() {
     println!("|--------------------------------------------------------------------------------------|");
-    println!("|Weatherbird version {} Copyright (C) 2026 Cameron Reynolds                      |", VERSION); //offset from variable
+    println!("|Weatherbird version {} Copyright (C) 2026 Cameron Reynolds                        |", VERSION); //offset from variable
     println!("|License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>        |");
     println!("|This program comes with ABSOLUTELY NO WARRANTY                                        |");
     println!("|This is free software, and you are welcome to redistribute it under certain conditions|");
