@@ -1,34 +1,30 @@
 // Weatherbird (C) Cameron Reynolds <cameron@starlordv125.net> 2026
 // A simple CLI based weather program
 
+use std::error::Error;
+use std::io;
+use std::num::ParseIntError;
 use std::{env, io::Write};
 use serde::Deserialize;
 use chrono::{self, NaiveDateTime, Timelike};
 use ureq;
+use crate::NumArg::*;
+use crate::ArgInfo::*;
 
 mod print;
 mod conf;
 
-// Struct for all info collected from arguements
-struct ArgInfo {
-    num: usize,
-    forecast: bool,
-    hours: bool,
-    set: bool,
-}
-
 // Top level JSON struct, needed to parse JSON response from openmeteo
 #[derive(Deserialize)]
 struct Obj {
-    current: JsonInfo,
+    current: Current,
     daily: Daily,
     hourly: Hourly
 }
 
 // Current weather data
-// TODO: Rename this struct to "Current"
 #[derive(Deserialize)]
-struct JsonInfo {
+struct Current {
     weather_code: u8,
     temperature_2m: f32,
     is_day: u8
@@ -50,70 +46,109 @@ struct Hourly {
     weather_code: Vec<u8>
 }
 
+pub enum ArgInfo {
+    NumArg(NumArg),
+    Set,
+    None
+}
+
+pub enum NumArg {
+    Days(String),
+    Hours(String)
+}
+
+impl NumArg {
+    pub fn convert(&self) -> Result<usize, Box<dyn Error>> {
+        let num = &self.check_parse()?;
+        Ok(self.check_size(*num)?)
+    }
+
+    fn check_parse(&self) -> Result<usize, ParseIntError> {
+        match self {
+            Days(num) => {return num.parse::<usize>()}
+            Hours(num) => {return num.parse::<usize>()}
+        }
+    }
+
+    fn check_size(&self, num: usize) -> Result<usize, io::Error> {
+        match self {
+            Days(_) => {
+                if num > 7 || num < 1 {
+                    return Err(std::io::Error::other("Number out of range"))
+                }
+                return Ok(num)
+            }
+            Hours(_) => {
+                if num > 24 || num < 1 {
+                    return Err(std::io::Error::other("Number out of range"))
+                }
+                return Ok(num)
+            }
+        }
+    }
+}
+
 // Change this when moving to a new version
 const VERSION: &str = "v0.5.1";
 
 fn main() {
     let info: ArgInfo = collect_args();
-    // Checks if multiple arguements are passed
-    if info.set == true && info.forecast == true {
-        error("Multiple arguements cannot be used at the same time");
-    }
-    if info.set == true {
-        let (lat, long) = set();
-        conf::write_conf(lat, long);
-        std::process::exit(0);
-    }
-    if info.hours == true {
-        if info.num > 24 || info.num < 1 {
-            error("Hour out of range");
+    match info {
+        Set => {
+            let (lat, long) = set();
+            conf::write_conf(lat, long);
+            std::process::exit(0)
         }
-        let json: Obj = meteo_get(2).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
-        forecast_hourly(json.hourly, info.num);
-        std::process::exit(0);
-    }
-    if info.forecast == true {
-        if info.num > 7 || info.num < 1 {
-            error("Day out of range");
+        ArgInfo::NumArg(arg) => {
+            let num: usize = arg.convert().unwrap_or_else(|err| {error(&err.to_string());0});
+            match arg {
+                Hours(_) => {
+                    let json: Obj = meteo_get(2).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
+                    forecast_hourly(json.hourly, num);
+                }
+                Days(_) => {
+                    let json: Obj = meteo_get(num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
+                    forecast(json.daily, num);
+                }
+            }
         }
-        let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
-        forecast(json.daily, info.num);
-        std::process::exit(0);
+        None => {
+            let json: Obj = meteo_get(1).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
+            let code = json.current.weather_code;
+            let is_day = json.current.is_day;
+            print::print_weather(code, is_day);
+            println!("Temperature: {}", json.current.temperature_2m);
+            println!("Min: {}", json.daily.temperature_2m_min[0]);
+            println!("Max: {}", json.daily.temperature_2m_max[0]);
+        }
     }
-    let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
-    let code = json.current.weather_code;
-    let is_day = json.current.is_day;
-    print::print_weather(code, is_day);
-    println!("Temperature: {}", json.current.temperature_2m);
-    println!("Min: {}", json.daily.temperature_2m_min[0]);
-    println!("Max: {}", json.daily.temperature_2m_max[0]);
 }
 
 // Collects arguements and does some basic error handling on its own
 // num_next will make the program expect a number for the next arguement
 fn collect_args() -> ArgInfo {
+    let mut arg_var: ArgInfo = None;
     let args: Vec<String> = env::args().collect();
     let mut num_next: bool = false;
-    let mut info = ArgInfo {
-        num: 1,
-        set: false,
-        forecast: false,
-        hours: false,
-    };
+    let mut invalid_format: bool = false;
     for arg in &args[1..] {
+        if invalid_format == true {
+            error("Invalid arguement format")
+        }
         match num_next {
             true => {
-                match arg.parse::<usize>() {
-                    Ok(o) => {info.num = o;}
-                    Err(_) => {error("Invalid number");}
+                match arg_var {
+                    NumArg(Days(_)) | NumArg(Hours(_)) => arg_var = NumArg(Days(arg.to_string())),
+                    _ => panic!("Arguement error")
                 }
                 num_next = false;
+                invalid_format = true;
             }
             false => {
                 match arg.as_str() {
-                "set" => {info.set = true}
-                "days" => {num_next = true;info.forecast = true}
-                "hours" => {num_next = true;info.hours = true}
+                "set" => {arg_var = Set;invalid_format = true}
+                "days" => {num_next = true;arg_var = NumArg(Days("".to_string()));}
+                "hours" => {num_next = true;arg_var = NumArg(Hours("".to_string()));}
                 "--version" | "-v" => {println!("{}", VERSION);std::process::exit(0)}
                 "--help" | "-h" => {help()}
                 _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
@@ -125,7 +160,7 @@ fn collect_args() -> ArgInfo {
         true => {error("Number not specified");}
         false => {}
     }
-    return info
+    return arg_var
 }
 
 // Help menu when "-h" or "--help" is passed
