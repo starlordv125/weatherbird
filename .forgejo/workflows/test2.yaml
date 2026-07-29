@@ -14,7 +14,7 @@ jobs:
       VERSION: "0.5.1"
       MESSAGE: "This release switches from reqwest, which needed an async runtime to ureq. This decreases the binary size by about two megabytes. This release also handles network connection errors more gracefully."
       RELEASE: 12
-      API_KEY: ${{ env.FORGEJO_TOKEN }}
+      API_KEY: ${{ secrets.API_KEY }}
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v3
