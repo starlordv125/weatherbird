@@ -1,0 +1,21 @@
+name: Rust test
+
+on:
+  push:
+    branches:
+      - localization
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    env:
+    # CHANGE THESE WHEN PUSHING TO MAIN
+    # +1 to RELEASE temp
+      VERSION: "0.5.1"
+      MESSAGE: "This release switches from reqwest, which needed an async runtime to ureq. This decreases the binary size by about two megabytes. This release also handles network connection errors more gracefully."
+      RELEASE: 12
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+      - name: Execute shell script
+        run: bash ./scripts/test.sh
