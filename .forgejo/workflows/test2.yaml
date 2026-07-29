@@ -17,5 +17,7 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v3
+      - name: Install Rust toolchain
+        uses: https://github.com/dtolnay/rust-toolchain@stable
       - name: Execute shell script
         run: ./scripts/test.sh
