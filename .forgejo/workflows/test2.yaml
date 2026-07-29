@@ -14,6 +14,7 @@ jobs:
       VERSION: "0.5.1"
       MESSAGE: "This release switches from reqwest, which needed an async runtime to ureq. This decreases the binary size by about two megabytes. This release also handles network connection errors more gracefully."
       RELEASE: 12
+      API_KEY: ${{ FORGEJO_TOKEN }}
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v3
@@ -28,7 +29,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Install Rust toolchain
         uses: https://github.com/dtolnay/rust-toolchain@stable
-      - name: Build binary
-        run: cargo build --release
-      - name: debug
-        run: uname -a
+      - name: Rootless docker install
+        run: curl -fsSL https://get.docker.com/rootless | sh
+      - name: Build x86 binary
+        run: ./scripts/test.sh
