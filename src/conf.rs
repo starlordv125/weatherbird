@@ -3,7 +3,7 @@ use std::env;
 use serde::{Deserialize, Serialize};
 use toml;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct TomlInfo {
     pub lat: String,
     pub long: String

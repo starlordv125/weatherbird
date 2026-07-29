@@ -46,13 +46,13 @@ struct Hourly {
     weather_code: Vec<u8>
 }
 
-pub enum ArgInfo {
+enum ArgInfo {
     NumArg(NumArg),
     Set,
     None
 }
 
-pub enum NumArg {
+enum NumArg {
     Days(String),
     Hours(String)
 }
