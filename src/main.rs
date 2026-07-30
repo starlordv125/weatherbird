@@ -89,14 +89,14 @@ impl NumArg {
 }
 
 // Change this when moving to a new version
-const VERSION: &str = "v0.5.1";
+const VERSION: &str = "v0.5.2";
 
 fn main() {
     let info: ArgInfo = collect_args();
     match info {
         Set => {
-            let (lat, long) = set();
-            conf::write_conf(lat, long);
+            let (lat, long, metric) = set();
+            conf::write_conf(lat, long, metric);
             std::process::exit(0)
         }
         ArgInfo::NumArg(arg) => {
@@ -194,9 +194,11 @@ fn error(message: &str) {
 
 // Will ask the user for coordinates and return them to main
 // Handles errors on its own
-fn set() -> (String, String) { 
+fn set() -> (String, String, bool) { 
     let mut lat = String::new();
     let mut long = String::new();
+    let mut metric = String::new();
+    let mut metric_bool: bool = false;
     println!("Weatherbird location setup");
     print!("Latitude: ");
     std::io::stdout().flush().expect("Error flushing output");
@@ -208,7 +210,15 @@ fn set() -> (String, String) {
     input_error_check(long.as_str());
     lat = lat.trim().to_string();
     long = long.trim().to_string();
-    return (lat, long);
+    print!("Use Metric system?(Y or N): ");
+    std::io::stdout().flush().expect("Error flushing output");
+    std::io::stdin().read_line(&mut metric).expect("Error reading user input");
+    match metric.as_str().trim() {
+        "Y" | "y" => {metric_bool = true}
+        "N" | "n" => {}
+        _ => {error("Value entered is not parseable");}
+    }
+    return (lat, long, metric_bool);
 }
 
 // Mainly used for set(), but can be expanded for other functions in the future
@@ -219,7 +229,7 @@ fn input_error_check(num: &str) {
     }
 }
 
-// Asynchronous for Reqwest, this function takes the coordinates and
+// This function takes the coordinates and
 // combines them with the URL to get weather data for the area.
 // For now it's just one big URL that gets all of the data possibly needed for the program,
 // that can be changed in the future
@@ -229,7 +239,11 @@ fn meteo_get(days: u8) -> Result<Obj, ureq::Error> {
     let days: String = days.to_string();
     std::io::stdout().flush().expect("Error flushing output");
     let conf: conf::TomlInfo = conf::read_conf();
-    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&hourly=temperature_2m,weather_code&forecast_days=" + &days;
+    let temp = match conf.metric {
+        true => {"celsius"}
+        false => {"fahrenheit"}
+    };
+    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=" + temp + "&wind_speed_unit=mph&precipitation_unit=inch&hourly=temperature_2m,weather_code&forecast_days=" + &days;
     let response = ureq::get(link)
     .call()?
     .body_mut()
