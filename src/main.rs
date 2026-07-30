@@ -138,7 +138,8 @@ fn collect_args() -> ArgInfo {
         match num_next {
             true => {
                 match arg_var {
-                    NumArg(Days(_)) | NumArg(Hours(_)) => arg_var = NumArg(Days(arg.to_string())),
+                    NumArg(Days(_)) => arg_var = NumArg(Days(arg.to_string())),
+                    NumArg(Hours(_)) => arg_var = NumArg(Hours(arg.to_string())),
                     _ => panic!("Arguement error")
                 }
                 num_next = false;
@@ -281,6 +282,7 @@ fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
             0 => {"Clear"}
             1 | 2 => {"Partly cloudy"}
             3 => {"Overcast"}
+            45 | 48 => {"Foggy"}
             51 | 53 | 55 => {"Light rain"}
             61 | 63 | 65 | 80 | 81 | 82 => {
                 "Heavy rain"
