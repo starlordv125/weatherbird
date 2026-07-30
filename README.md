@@ -21,7 +21,7 @@ Min: 67.2
 Max: 78.5
 ```
 ## Arguements
-`set`: Asks for latitude and longitutde and will save the configuration as the location to use for Weatherbird.
+`set`: Asks for units, latitude, and longitutde and will save the configuration as the location to use for Weatherbird.
 
 `days [1-7]`: Gives a forecast of up to 7 days
 
