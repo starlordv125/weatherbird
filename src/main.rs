@@ -1,34 +1,30 @@
 // Weatherbird (C) Cameron Reynolds <cameron@starlordv125.net> 2026
 // A simple CLI based weather program
 
+use std::error::Error;
+use std::io;
+use std::num::ParseIntError;
 use std::{env, io::Write};
 use serde::Deserialize;
 use chrono::{self, NaiveDateTime, Timelike};
 use ureq;
+use crate::NumArg::*;
+use crate::ArgInfo::*;
 
 mod print;
 mod conf;
 
-// Struct for all info collected from arguements
-struct ArgInfo {
-    num: usize,
-    forecast: bool,
-    hours: bool,
-    set: bool,
-}
-
 // Top level JSON struct, needed to parse JSON response from openmeteo
 #[derive(Deserialize)]
 struct Obj {
-    current: JsonInfo,
+    current: Current,
     daily: Daily,
     hourly: Hourly
 }
 
 // Current weather data
-// TODO: Rename this struct to "Current"
 #[derive(Deserialize)]
-struct JsonInfo {
+struct Current {
     weather_code: u8,
     temperature_2m: f32,
     is_day: u8
@@ -50,70 +46,109 @@ struct Hourly {
     weather_code: Vec<u8>
 }
 
-// Change this when moving to a new version
-const VERSION: &str = "v0.5.1";
+enum ArgInfo {
+    NumArg(NumArg),
+    Set,
+    None
+}
+
+enum NumArg {
+    Days(String),
+    Hours(String)
+}
+
+impl NumArg {
+    pub fn convert(&self) -> Result<usize, Box<dyn Error>> {
+        let num = &self.check_parse()?;
+        Ok(self.check_size(*num)?)
+    }
+
+    fn check_parse(&self) -> Result<usize, ParseIntError> {
+        match self {
+            Days(num) => {return num.parse::<usize>()}
+            Hours(num) => {return num.parse::<usize>()}
+        }
+    }
+
+    fn check_size(&self, num: usize) -> Result<usize, io::Error> {
+        match self {
+            Days(_) => {
+                if num > 7 || num < 1 {
+                    return Err(std::io::Error::other("Number out of range"))
+                }
+                return Ok(num)
+            }
+            Hours(_) => {
+                if num > 24 || num < 1 {
+                    return Err(std::io::Error::other("Number out of range"))
+                }
+                return Ok(num)
+            }
+        }
+    }
+}
+//
+const VERSION: &str = "v0.5.2";
 
 fn main() {
     let info: ArgInfo = collect_args();
-    // Checks if multiple arguements are passed
-    if info.set == true && info.forecast == true {
-        error("Multiple arguements cannot be used at the same time");
-    }
-    if info.set == true {
-        let (lat, long) = set();
-        conf::write_conf(lat, long);
-        std::process::exit(0);
-    }
-    if info.hours == true {
-        if info.num > 24 || info.num < 1 {
-            error("Hour out of range");
+    match info {
+        Set => {
+            let (lat, long, metric) = set();
+            conf::write_conf(lat, long, metric);
+            std::process::exit(0)
         }
-        let json: Obj = meteo_get(2).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
-        forecast_hourly(json.hourly, info.num);
-        std::process::exit(0);
-    }
-    if info.forecast == true {
-        if info.num > 7 || info.num < 1 {
-            error("Day out of range");
+        ArgInfo::NumArg(arg) => {
+            let num: usize = arg.convert().unwrap_or_else(|err| {error(&err.to_string());0});
+            match arg {
+                Hours(_) => {
+                    let json: Obj = meteo_get(2).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
+                    forecast_hourly(json.hourly, num);
+                }
+                Days(_) => {
+                    let json: Obj = meteo_get(num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
+                    forecast(json.daily, num);
+                }
+            }
         }
-        let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
-        forecast(json.daily, info.num);
-        std::process::exit(0);
+        None => {
+            let json: Obj = meteo_get(1).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
+            let code = json.current.weather_code;
+            let is_day = json.current.is_day;
+            print::print_weather(code, is_day);
+            println!("Temperature: {}", json.current.temperature_2m);
+            println!("Min: {}", json.daily.temperature_2m_min[0]);
+            println!("Max: {}", json.daily.temperature_2m_max[0]);
+        }
     }
-    let json: Obj = meteo_get(info.num.try_into().expect("Critical error")).unwrap_or_else(|error| {eprintln!("\rError: {}", error);std::process::exit(2)});
-    let code = json.current.weather_code;
-    let is_day = json.current.is_day;
-    print::print_weather(code, is_day);
-    println!("Temperature: {}", json.current.temperature_2m);
-    println!("Min: {}", json.daily.temperature_2m_min[0]);
-    println!("Max: {}", json.daily.temperature_2m_max[0]);
 }
 
 // Collects arguements and does some basic error handling on its own
 // num_next will make the program expect a number for the next arguement
 fn collect_args() -> ArgInfo {
+    let mut arg_var: ArgInfo = None;
     let args: Vec<String> = env::args().collect();
     let mut num_next: bool = false;
-    let mut info = ArgInfo {
-        num: 1,
-        set: false,
-        forecast: false,
-        hours: false,
-    };
+    let mut invalid_format: bool = false;
     for arg in &args[1..] {
+        if invalid_format == true {
+            error("Invalid arguement format")
+        }
         match num_next {
             true => {
-                match arg.parse::<usize>() {
-                    Ok(o) => {info.num = o;}
-                    Err(_) => {error("Invalid number");}
+                match arg_var {
+                    NumArg(Days(_)) => arg_var = NumArg(Days(arg.to_string())),
+                    NumArg(Hours(_)) => arg_var = NumArg(Hours(arg.to_string())),
+                    _ => panic!("Arguement error")
                 }
                 num_next = false;
+                invalid_format = true;
             }
             false => {
                 match arg.as_str() {
-                "set" => {info.set = true}
-                "days" => {num_next = true;info.forecast = true}
-                "hours" => {num_next = true;info.hours = true}
+                "set" => {arg_var = Set;invalid_format = true}
+                "days" => {num_next = true;arg_var = NumArg(Days("".to_string()));}
+                "hours" => {num_next = true;arg_var = NumArg(Hours("".to_string()));}
                 "--version" | "-v" => {println!("{}", VERSION);std::process::exit(0)}
                 "--help" | "-h" => {help()}
                 _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
@@ -125,13 +160,13 @@ fn collect_args() -> ArgInfo {
         true => {error("Number not specified");}
         false => {}
     }
-    return info
+    return arg_var
 }
 
 // Help menu when "-h" or "--help" is passed
 fn help() {
     println!("|--------------------------------------------------------------------------------------|");
-    println!("|Weatherbird version {} Copyright (C) 2026 Cameron Reynolds                      |", VERSION); //offset from variable
+    println!("|Weatherbird version {} Copyright (C) 2026 Cameron Reynolds                        |", VERSION); //offset from variable
     println!("|License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>        |");
     println!("|This program comes with ABSOLUTELY NO WARRANTY                                        |");
     println!("|This is free software, and you are welcome to redistribute it under certain conditions|");
@@ -158,9 +193,11 @@ fn error(message: &str) {
 
 // Will ask the user for coordinates and return them to main
 // Handles errors on its own
-fn set() -> (String, String) { 
+fn set() -> (String, String, bool) { 
     let mut lat = String::new();
     let mut long = String::new();
+    let mut metric = String::new();
+    let mut metric_bool: bool = false;
     println!("Weatherbird location setup");
     print!("Latitude: ");
     std::io::stdout().flush().expect("Error flushing output");
@@ -172,7 +209,15 @@ fn set() -> (String, String) {
     input_error_check(long.as_str());
     lat = lat.trim().to_string();
     long = long.trim().to_string();
-    return (lat, long);
+    print!("Use Metric system?(Y or N): ");
+    std::io::stdout().flush().expect("Error flushing output");
+    std::io::stdin().read_line(&mut metric).expect("Error reading user input");
+    match metric.as_str().trim() {
+        "Y" | "y" => {metric_bool = true}
+        "N" | "n" => {}
+        _ => {error("Value entered is not parseable");}
+    }
+    return (lat, long, metric_bool);
 }
 
 // Mainly used for set(), but can be expanded for other functions in the future
@@ -183,7 +228,7 @@ fn input_error_check(num: &str) {
     }
 }
 
-// Asynchronous for Reqwest, this function takes the coordinates and
+// This function takes the coordinates and
 // combines them with the URL to get weather data for the area.
 // For now it's just one big URL that gets all of the data possibly needed for the program,
 // that can be changed in the future
@@ -193,7 +238,11 @@ fn meteo_get(days: u8) -> Result<Obj, ureq::Error> {
     let days: String = days.to_string();
     std::io::stdout().flush().expect("Error flushing output");
     let conf: conf::TomlInfo = conf::read_conf();
-    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&hourly=temperature_2m,weather_code&forecast_days=" + &days;
+    let temp = match conf.metric {
+        true => {"celsius"}
+        false => {"fahrenheit"}
+    };
+    let link: String = "https://api.open-meteo.com/v1/forecast?latitude=".to_owned() + conf.lat.as_str() + "&longitude=" + conf.long.as_str() + "&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min&current=temperature_2m,weather_code,is_day&temperature_unit=" + temp + "&wind_speed_unit=mph&precipitation_unit=inch&hourly=temperature_2m,weather_code&forecast_days=" + &days;
     let response = ureq::get(link)
     .call()?
     .body_mut()
@@ -246,6 +295,7 @@ fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
             0 => {"Clear"}
             1 | 2 => {"Partly cloudy"}
             3 => {"Overcast"}
+            45 | 48 => {"Foggy"}
             51 | 53 | 55 => {"Light rain"}
             61 | 63 | 65 | 80 | 81 | 82 => {
                 "Heavy rain"
