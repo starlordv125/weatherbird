@@ -275,7 +275,7 @@ fn forecast_hourly(hourly_info: Hourly, hours: usize) {
         hour_index += 1;
     }
     let hour_index_end: usize = hour_index + hours;
-    let weather_codes: Vec<String> = code_alloc(hourly_info.weather_code, hour_index_end);
+    let weather_codes: Vec<&str> = code_alloc(hourly_info.weather_code, hour_index_end);
     for num in hour_index..hour_index_end {
         println!("\r-------------------");
         println!("Hour: {}", NaiveDateTime::parse_from_str(&hourly_info.time[num], "%Y-%m-%dT%H:%M").unwrap().hour());
@@ -288,10 +288,10 @@ fn forecast_hourly(hourly_info: Hourly, hours: usize) {
 
 // Used for both forecast() and forecast_hourly(), this converts weather codes
 // into corresponding descriptions of the weather
-fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
-    let mut weathers: Vec<String> = Vec::new();
+fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<&'static str> {
+    let mut weathers: Vec<&str> = Vec::new();
     for num in 0..size {
-        weathers.push((match codes[num] {
+        weathers.push(match codes[num] {
             0 => {"Clear"}
             1 | 2 => {"Partly cloudy"}
             3 => {"Overcast"}
@@ -307,7 +307,7 @@ fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
             96 | 99 => {"Hail"}
             _ => {"Unknown"}
             }
-        ).to_string())
+        )
     }
     return weathers;
 }
