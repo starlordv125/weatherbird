@@ -24,6 +24,10 @@ COMPREPLY=( $(compgen -W "set days hours --help --version" -- "$cur") )
 }
 complete -F _Weatherbird weatherbird' >> package/deb/weatherbird/usr/share/bash-completion/completions/weatherbird
 
+# Man compression
+cp man/weatherbird.1 package/deb/weatherbird/usr/share/man/man1
+gzip package/deb/weatherbird/usr/share/man/man1/weatherbird.1
+
 # Debian packaging
 cp target/release/weatherbird package/deb/weatherbird/usr/bin
 cd package/deb

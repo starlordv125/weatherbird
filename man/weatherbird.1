@@ -1,0 +1,32 @@
+.\" Manpage for weatherbird, goes in section 1
+.TH WEATHERBIRD 1 "08 Aug 2026" "0.5.2" "Weatherbird man page"
+.SH NAME
+weatherbird \- display current weather
+.SH SYNOPSIS
+weatherbird [--help]
+
+weatherbird [--version]
+
+weatherbird [[days] [1-7]]
+
+weatherbird [[hours] [1-24]]
+
+weatherbird [set]
+.SH DESCRIPTION
+Weatherbird is a simple CLI utility that fetches the weather from Openmeteo and displays it.
+Use "weatherbird set" to set coordinates. You can then specify "hours" or "days" to see a forecast
+of the coming weather, or use no arguements to see the current weather.
+.SH OPTIONS
+[-h, --help] \- Displays a help menu
+
+[-v, --version] \- Prints the version number
+
+days [1-7] \- Prints a forecast of up to 7 days
+
+hours [1-24] \- Prints a forecast of up to 24 hours
+
+set \- Interactive weatherbird configuration
+.SH AUTHOR
+Cameron Reynolds <cameron@starlordv125.net>
+.SH REPOSITORY
+<https://forgejo.starlordv125.net/starlordv125/weatherbird>
