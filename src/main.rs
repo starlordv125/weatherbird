@@ -147,8 +147,8 @@ fn collect_args() -> ArgInfo {
             false => {
                 match arg.as_str() {
                 "set" => {arg_var = Set;invalid_format = true}
-                "days" => {num_next = true;arg_var = NumArg(Days("".to_string()));}
-                "hours" => {num_next = true;arg_var = NumArg(Hours("".to_string()));}
+                "days" => {num_next = true;arg_var = NumArg(Days(String::new()));}
+                "hours" => {num_next = true;arg_var = NumArg(Hours(String::new()));}
                 "--version" | "-v" => {println!("{}", VERSION);std::process::exit(0)}
                 "--help" | "-h" => {help()}
                 _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}

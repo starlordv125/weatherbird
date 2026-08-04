@@ -1,0 +1,30 @@
+name: Main workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    env:
+    # CHANGE THESE WHEN PUSHING TO MAIN
+    # +1 to RELEASE temp
+      VERSION: "0.5.2"
+      MESSAGE: "This release adds the option to pick the metric system when using `weatherbird set`. Multiple bugs have been fixed, including fog showing as an unknown weather type."
+      RELEASE: 13
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+        - name: Checkout  # Clone git repository
+          uses: actions/checkout@v3
+        - name: Install Rust toolchain
+          uses: https://github.com/dtolnay/rust-toolchain@stable
+        - name: Setup
+          run: ./scripts/setup.sh
+        - name: Build binary
+          run: ./scripts/build.sh
+        - name: Create release
+          run: ./scripts/release.sh
+        - name: Create and update Debian package
+          run: ./scripts/debian.sh
