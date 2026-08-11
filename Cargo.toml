@@ -27,3 +27,12 @@ opt-level = 3
 lto = true
 codegen-units = 1
 panic = "abort"
+
+[package.metadata.generate-rpm]
+release = 1
+require-sh = false
+assets = [
+    { source = "target/release/weatherbird", dest = "/bin/weatherbird", mode = "755" },
+    { source = "man/weatherbird.1.gz", dest = "/usr/share/man/man1", mode = "755" },
+    { source = "bash-completion/weatherbird", dest = "/usr/share/bash-completion/completions/weatherbird", mode = "755" }
+]

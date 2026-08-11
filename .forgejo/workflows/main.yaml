@@ -28,3 +28,5 @@ jobs:
           run: ./scripts/release.sh
         - name: Create and update Debian package
           run: ./scripts/debian.sh
+        - name: Create and update RPM
+          run: ./scripts/rpm.sh

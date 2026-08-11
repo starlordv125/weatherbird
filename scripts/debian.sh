@@ -15,18 +15,10 @@ Distribution: trixie
 Component: main" >> package/deb/weatherbird/DEBIAN/control
 
 # Bash autocompletion
-echo '#!/bin/bash
+cp bash-completion/weatherbird package/deb/weatherbird/usr/share/bash-completion/completions/weatherbird
 
-_Weatherbird() {
-local cur
-cur=${COMP_WORDS[COMP_CWORD]}
-COMPREPLY=( $(compgen -W "set days hours --help --version" -- "$cur") )
-}
-complete -F _Weatherbird weatherbird' >> package/deb/weatherbird/usr/share/bash-completion/completions/weatherbird
-
-# Man compression
-cp man/weatherbird.1 package/deb/weatherbird/usr/share/man/man1
-gzip package/deb/weatherbird/usr/share/man/man1/weatherbird.1
+# Man page
+cp man/weatherbird.1.gz package/deb/weatherbird/usr/share/man/man1
 
 # Debian packaging
 cp target/release/weatherbird package/deb/weatherbird/usr/bin

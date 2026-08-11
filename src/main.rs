@@ -87,7 +87,7 @@ impl NumArg {
         }
     }
 }
-//
+// Change this when upgrading
 const VERSION: &str = "v0.5.2";
 
 fn main() {
