@@ -98,7 +98,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("|    /                \\   |");
                 println!("|   |__________________|  |");
                 println!("|                         |");
-                println!("|      /            /     |");
+                println!("|     /            /      |");
                 println!("|                         |");
                 println!("|-------------------------|");
                 println!("Light rain");
