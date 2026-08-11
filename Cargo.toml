@@ -13,7 +13,6 @@ include = [
     "LICENSE",
 ]
 license = "GPLv3"
-optional = "true"
 
 [dependencies]
 chrono = "0.4.45"
@@ -29,6 +28,7 @@ codegen-units = 1
 panic = "abort"
 
 [package.metadata.generate-rpm]
+optional = "true"
 release = 1
 require-sh = false
 assets = [
