@@ -24,13 +24,5 @@ jobs:
           run: ./scripts/setup.sh
         - name: Build binary
           run: ./scripts/build.sh
-        - name: Sign all RPM packages at Packages folder.
-          uses: https://github.com/signalwire/sign-rpm-packages-action@v1.0.0
-          with:
-            gpg_file: ./decoded-key.gpg
-            gpg_name: cameron@starlordv125.net
-            target_path: .
-            target_folder: signed-rpm
-            rpm_path: ./target/generate-rpm/weatherbird-${{ env.VERSION }}-2.x86_64.rpm
-        - name: upload rpm
+        - name: Sign and upload rpm
           run: ./scripts/rpm.sh
