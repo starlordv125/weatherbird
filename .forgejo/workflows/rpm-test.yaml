@@ -1,0 +1,36 @@
+name: RPM-test
+
+on:
+  push:
+    branches:
+      - packaging
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: "0.5.2"
+      MESSAGE: "This release adds the option to pick the metric system when using `weatherbird set`. Multiple bugs have been fixed, including fog showing as an unknown weather type."
+      RELEASE: 13
+      API_KEY: ${{ secrets.FORGEJO_TOKEN }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASS: ${{ secrets.GPG_PASS }}
+    steps:
+        - name: Checkout  # Clone git repository
+          uses: actions/checkout@v3
+        - name: Install Rust toolchain
+          uses: https://github.com/dtolnay/rust-toolchain@stable
+        - name: Setup
+          run: ./scripts/setup.sh
+        - name: Build binary
+          run: ./scripts/build.sh
+        - name: Sign all RPM packages at Packages folder.
+          uses: https://github.com/dante-signal31/rpmsign@v1.0.3
+          with:
+            gpg_private_key: ./decoded-key.gpg
+            gpg_private_key_password: ${{ secrets.GPG_PASS }}
+            gpg_name: Cameron Reynolds <cameron@starlordv125.net>
+            rpm_file: target/generate-rpm/weatherbird-${{ env.VERSION }}-2.x86_64.rpm
+            output_folder: signed_rpm/
+        - name: upload rpm
+          run: ./scripts/rpm.sh
