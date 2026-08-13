@@ -13,8 +13,6 @@ jobs:
       MESSAGE: "This release adds the option to pick the metric system when using `weatherbird set`. Multiple bugs have been fixed, including fog showing as an unknown weather type."
       RELEASE: 13
       API_KEY: ${{ secrets.FORGEJO_TOKEN }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_PASS: ${{ secrets.GPG_PASS }}
     steps:
         - name: Checkout  # Clone git repository
           uses: actions/checkout@v3
