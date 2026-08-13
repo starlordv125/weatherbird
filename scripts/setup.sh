@@ -5,7 +5,7 @@ mkdir package
 mkdir package/weatherbird-linux-amd64
 
 # Man setup
-gzip package/deb/weatherbird/usr/share/man/man1/weatherbird.1
+gzip man/weatherbird.1
 
 # Debian setup
 mkdir -p package/deb/weatherbird/DEBIAN/
