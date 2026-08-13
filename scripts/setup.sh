@@ -15,7 +15,8 @@ mkdir -p package/deb/weatherbird/usr/bin
 mkdir -p package/deb/weatherbird/usr/share/man/man1/
 
 # RPM setup
+apt update
+apt install rpm -y
 cargo install cargo-generate-rpm
 mkdir signed-rpm
 echo $GPG_KEY | base64 -di > decoded-key.gpg
-apt install rpm -y
