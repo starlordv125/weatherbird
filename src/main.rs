@@ -13,6 +13,7 @@ use crate::ArgInfo::*;
 
 mod print;
 mod conf;
+mod location;
 
 // Top level JSON struct, needed to parse JSON response from openmeteo
 #[derive(Deserialize)]
@@ -191,14 +192,38 @@ fn error(message: &str) {
     std::process::exit(1);
 }
 
-// Will ask the user for coordinates and return them to main
+// Gets coordinates either automatically or manually from the user and returns them to main
 // Handles errors on its own
-fn set() -> (String, String, bool) { 
+fn set() -> (String, String, bool){ 
+    let mut metric = String::new();
+    let mut auto = String::new();
+    let mut metric_bool: bool = false;
     let mut lat = String::new();
     let mut long = String::new();
-    let mut metric = String::new();
-    let mut metric_bool: bool = false;
     println!("Weatherbird location setup");
+    print!("Would you like Weatherbird to automatically set location?(Y or N, not reccomended if using vpn): ");
+    std::io::stdout().flush().expect("Error flushing output");
+    std::io::stdin().read_line(&mut auto).expect("Error reading user input");
+    match auto.as_str().trim() {
+        "Y" | "y" => {(lat, long) = automatic_setup()}
+        "N" | "n" => {(lat, long) = manual_setup()}
+        _ => {error("Value entered is not parseable");}
+    }
+    print!("Use Metric system?(Y or N): ");
+    std::io::stdout().flush().expect("Error flushing output");
+    std::io::stdin().read_line(&mut metric).expect("Error reading user input");
+    match metric.as_str().trim() {
+        "Y" | "y" => {metric_bool = true}
+        "N" | "n" => {}
+        _ => {error("Value entered is not parseable");}
+    }
+    return (lat, long, metric_bool);
+}
+
+//Allows the user to manually set their location using coordinates
+fn manual_setup() -> (String, String) {
+    let mut lat = String::new();
+    let mut long = String::new();
     print!("Latitude: ");
     std::io::stdout().flush().expect("Error flushing output");
     std::io::stdin().read_line(&mut lat).expect("Error reading user input");
@@ -209,15 +234,23 @@ fn set() -> (String, String, bool) {
     input_error_check(long.as_str());
     lat = lat.trim().to_string();
     long = long.trim().to_string();
-    print!("Use Metric system?(Y or N): ");
+    return (lat, long)
+}
+
+//Automatically sets the users coordinates
+fn automatic_setup() -> (String, String){
+    let mut lat = String::new();
+    let mut long = String::new();
+    let mut allow = String::new();
+    print!("By using automatic setup you are allowing Weatherbird to access your public IP and forward it to the ipapi service\nWould you still like to continue?(Y or N): ");
     std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut metric).expect("Error reading user input");
-    match metric.as_str().trim() {
-        "Y" | "y" => {metric_bool = true}
-        "N" | "n" => {}
+    std::io::stdin().read_line(&mut allow).expect("Error reading user input");
+    match allow.as_str().trim() {
+        "Y" | "y" => {(lat, long) = location::location_get()}
+        "N" | "n" => {(lat, long) = manual_setup()}
         _ => {error("Value entered is not parseable");}
     }
-    return (lat, long, metric_bool);
+    return (lat, long);
 }
 
 // Mainly used for set(), but can be expanded for other functions in the future
