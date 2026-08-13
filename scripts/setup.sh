@@ -16,6 +16,5 @@ mkdir -p package/deb/weatherbird/usr/share/man/man1/
 
 # RPM setup
 cargo install cargo-generate-rpm
-mkdir signed_rpm
+mkdir signed-rpm
 echo $GPG_KEY | base64 -di > decoded-key.gpg
-apt install docker -y

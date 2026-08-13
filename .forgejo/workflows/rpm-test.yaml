@@ -25,12 +25,12 @@ jobs:
         - name: Build binary
           run: ./scripts/build.sh
         - name: Sign all RPM packages at Packages folder.
-          uses: https://github.com/dante-signal31/rpmsign@v1.0.3
+          uses: https://github.com/signalwire/sign-rpm-packages-action@v1.0.0
           with:
-            gpg_private_key: ./decoded-key.gpg
-            gpg_private_key_password: ${{ secrets.GPG_PASS }}
-            gpg_name: Cameron Reynolds <cameron@starlordv125.net>
-            rpm_file: target/generate-rpm/weatherbird-${{ env.VERSION }}-2.x86_64.rpm
-            output_folder: signed_rpm/
+            gpg_file: ./decoded-key.gpg
+            gpg_name: cameron@starlordv125.net
+            target_path: .
+            target_folder: signed-rpm
+            rpm_path: ./target/generate-rpm/weatherbird-${{ env.VERSION }}-2.x86_64.rpm
         - name: upload rpm
           run: ./scripts/rpm.sh
