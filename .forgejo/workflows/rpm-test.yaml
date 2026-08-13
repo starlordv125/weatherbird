@@ -12,7 +12,7 @@ jobs:
       VERSION: "0.5.2"
       MESSAGE: "This release adds the option to pick the metric system when using `weatherbird set`. Multiple bugs have been fixed, including fog showing as an unknown weather type."
       RELEASE: 13
-      API_KEY: ${{ secrets.FORGEJO_TOKEN }}
+      API_KEY: ${{ secrets.API_KEY }}
     steps:
         - name: Checkout  # Clone git repository
           uses: actions/checkout@v3
