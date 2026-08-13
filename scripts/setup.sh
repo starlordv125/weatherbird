@@ -16,3 +16,4 @@ mkdir -p package/deb/weatherbird/usr/share/man/man1/
 
 # RPM setup
 cargo install cargo-generate-rpm
+mkdir signed_rpm

@@ -29,7 +29,7 @@ panic = "abort"
 
 [package.metadata.generate-rpm]
 optional = "true"
-release = 1
+release = 2
 require-sh = false
 assets = [
     { source = "target/release/weatherbird", dest = "/bin/weatherbird", mode = "755" },
