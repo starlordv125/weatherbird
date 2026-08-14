@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # DEBUG
-echo $MESSAGE
+echo \"$MESSAGE\"
 
 # Release setup
 mkdir package
