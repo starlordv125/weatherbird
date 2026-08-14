@@ -4,36 +4,37 @@ use ureq;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-struct Ip
-{
+struct Ip {
     ip: String
 }
 
 #[derive(Deserialize)]
-struct Loc
-{
+struct Loc {
     lat: f32,
     lon: f32
 }
 
 //Gets public facing IP of user and passes it to the coordinate grabbing function
 //Passes the latitude and longitude as strings to where it was called
-pub fn location_get() -> (String, String){
-    let ip_structure = ip_get();
-    let ip_json = ip_structure.unwrap();
-    let ip = ip_json.ip;
-
+pub fn location_get() -> (String, String) {
+    let mut ip = String::new();
+    match ip_get() {
+        Ok(o) => {ip = o.ip}
+        Err(_) => {crate::error("Network error");}
+    }
     let loc_link = create_link(ip);
-    let loc_structure = coordinates_get(loc_link);
-    let loc_json = loc_structure.unwrap();
-    let latitude = loc_json.lat.to_string();
-    let longitude = loc_json.lon.to_string();
+    let mut lat = String::new();
+    let mut lon = String::new();
+    match coordinates_get(loc_link) {
+        Ok(o) => {lat = o.lat.to_string();lon = o.lon.to_string()}
+        Err(_) => {crate::error("Network error");}
+    }
 
-    return (latitude, longitude);
+    return (lat, lon);
 }
 
 //Uses the ipify API to grab the users public facing IP address
-fn ip_get() -> Result<Ip, ureq::Error>{
+fn ip_get() -> Result<Ip, ureq::Error> {
     let response = ureq::get("https://api.ipify.org?format=json")
     .call()?
     .body_mut()
@@ -43,7 +44,7 @@ fn ip_get() -> Result<Ip, ureq::Error>{
 
 //Uses the ipapi API and passes the users public facing IP
 //Returns approximate coordinates of the users device
-fn coordinates_get(link: String) -> Result<Loc, ureq::Error>{
+fn coordinates_get(link: String) -> Result<Loc, ureq::Error> {
     let response = ureq::get(link)
     .call()?
     .body_mut()
@@ -52,7 +53,6 @@ fn coordinates_get(link: String) -> Result<Loc, ureq::Error>{
 }
 
 //Creates the full link passed to the coordinates_get function
-fn create_link(ip: String) -> (String){
-    let full_link = "http://ip-api.com/json/".to_owned() + ip.as_str();
-    return full_link
+fn create_link(ip: String) -> String {
+    return "http://ip-api.com/json/".to_owned() + ip.as_str();
 }
