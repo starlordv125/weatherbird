@@ -13,7 +13,7 @@ jobs:
     # +1 to RELEASE temp
     # TODO: Automate release number
       VERSION: "0.6.0"
-      MESSAGE: 'This release introduces auto location for weatherbird! Using \`weatherbird set\` and answering \`Y\` will use Ipify to get approximate coordinates based off of a public IP address. This release has also had a CI pipeline update, which means RPM packages are available. Due to Forgejo not adding auto RPM signing yet, you may have to use \`sudo dnf install weatherbird \--no-gpgchecks\`.'
+      MESSAGE: 'This release introduces auto location for weatherbird! Using `weatherbird set` and answering `Y` will use Ipify to get approximate coordinates based off of a public IP address. This release has also had a CI pipeline update, which means RPM packages are available. Due to Forgejo not adding auto RPM signing yet, you may have to use `sudo dnf install weatherbird --no-gpgchecks`.'
       RELEASE: 14
       API_KEY: ${{ secrets.API_KEY }}
     steps:
