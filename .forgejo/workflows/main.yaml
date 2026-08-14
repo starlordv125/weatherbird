@@ -1,0 +1,33 @@
+name: Main workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    env:
+    # CHANGE THESE WHEN PUSHING TO MAIN
+    # +1 to RELEASE temp
+    # TODO: Automate release number
+      VERSION: "0.6.0"
+      MESSAGE: "This release introduces auto location for weatherbird! Using `weatherbird set` and answering `Y` will use Ipify to get approximate coordinates based off of a public IP address. This release has also had a CI pipeline update, which means RPM packages are available. Due to Forgejo not adding auto RPM signing yet, you may have to use `sudo dnf install weatherbird --no-gpgchecks.\n- Cam"
+      RELEASE: 14
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+        - name: Checkout  # Clone git repository
+          uses: actions/checkout@v3
+        - name: Install Rust toolchain
+          uses: https://github.com/dtolnay/rust-toolchain@stable
+        - name: Setup
+          run: ./scripts/setup.sh
+        - name: Build binary
+          run: ./scripts/build.sh
+        - name: Create release
+          run: ./scripts/release.sh
+        - name: Create and update Debian package
+          run: ./scripts/debian.sh
+        - name: Create and update RPM
+          run: ./scripts/rpm.sh

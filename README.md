@@ -30,3 +30,8 @@ Max: 78.5
 `--help, -h`: Prints the help screen
 
 `--version, -v`: Prints the version
+
+## Authors
+Cameron Reynolds <cameron@starlordv125.net>
+
+Iris Davidson <c0dysemsiladd@gmail.com>

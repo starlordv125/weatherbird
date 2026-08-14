@@ -17,15 +17,15 @@ pub fn print_weather(code: u8, day: u8) {
             }
             1 | 2 => {
                 println!("\r|-------------------------|");
-                println!("|    \\       |      /     |");
-                println!("|     \\      |     /      |");
+                println!("|     \\       |      /    |");
+                println!("|      \\      |     /     |");
                 println!("|       ------------      |");
                 println!("|      /            \\     |");
                 println!("|  ___|           _/-\\___ |");
-                println!("|     _          /_____\\  |");
-                println!("|   _/ \\_____________/    |");
-                println!("|  /     \\    |      \\    |");
-                println!("| /______/    |       \\   |");
+                println!("|     |_         /_____\\  |");
+                println!("|    _/ \\___________/     |");
+                println!("|   /     \\   |     \\     |");
+                println!("|  /______/   |      \\    |");
                 println!("|-------------------------|");
                 println!("Partly cloudy");
             }
@@ -98,7 +98,7 @@ pub fn print_weather(code: u8, day: u8) {
                 println!("|    /                \\   |");
                 println!("|   |__________________|  |");
                 println!("|                         |");
-                println!("|      /            /     |");
+                println!("|     /            /      |");
                 println!("|                         |");
                 println!("|-------------------------|");
                 println!("Light rain");

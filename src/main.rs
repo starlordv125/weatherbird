@@ -13,6 +13,7 @@ use crate::ArgInfo::*;
 
 mod print;
 mod conf;
+mod location;
 
 // Top level JSON struct, needed to parse JSON response from openmeteo
 #[derive(Deserialize)]
@@ -87,7 +88,7 @@ impl NumArg {
         }
     }
 }
-//
+// Change this when upgrading
 const VERSION: &str = "v0.5.2";
 
 fn main() {
@@ -147,8 +148,8 @@ fn collect_args() -> ArgInfo {
             false => {
                 match arg.as_str() {
                 "set" => {arg_var = Set;invalid_format = true}
-                "days" => {num_next = true;arg_var = NumArg(Days("".to_string()));}
-                "hours" => {num_next = true;arg_var = NumArg(Hours("".to_string()));}
+                "days" => {num_next = true;arg_var = NumArg(Days(String::new()));}
+                "hours" => {num_next = true;arg_var = NumArg(Hours(String::new()));}
                 "--version" | "-v" => {println!("{}", VERSION);std::process::exit(0)}
                 "--help" | "-h" => {help()}
                 _ => {error(&("Unrecognized arguement: \"".to_owned() + arg + "\""))}
@@ -174,7 +175,7 @@ fn help() {
     println!("|Arguements                                                                            |");
     println!("|--help or -h -> Displays this menu                                                    |");
     println!("|--version or -v -> Shows version number                                               |");
-    println!("|set -> Allows you to set coordinates, will overwrite previous configuration           |");
+    println!("|set -> Interactive settings menu, will overwrite previous configuration               |");
     println!("|days [1-7] -> Shows a forecast of up to seven days                                    |");
     println!("|hours [1-24] -> Shows a forecast of up to twenty-four hours                           |");
     println!("|--------------------------------------------------------------------------------------|");
@@ -191,40 +192,73 @@ fn error(message: &str) {
     std::process::exit(1);
 }
 
-// Will ask the user for coordinates and return them to main
+// Gets coordinates either automatically or manually from the user and returns them to main
 // Handles errors on its own
-fn set() -> (String, String, bool) { 
+fn set() -> (String, String, bool){ 
+    let mut metric = String::new();
+    let mut auto = String::new();
+    let mut metric_bool: bool = false;
     let mut lat = String::new();
     let mut long = String::new();
-    let mut metric = String::new();
-    let mut metric_bool: bool = false;
     println!("Weatherbird location setup");
-    print!("Latitude: ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut lat).expect("Error reading user input");
-    input_error_check(lat.as_str());
-    print!("Longitude: ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut long).expect("Error reading user input");
-    input_error_check(long.as_str());
-    lat = lat.trim().to_string();
-    long = long.trim().to_string();
+    println!("Would you like Weatherbird to automatically set location?");
+    print!("(Y or N, not recomended if using vpn): ");
+    auto = flush_read(auto);
+    match auto.as_str().trim() {
+        "Y" | "y" => {(lat, long) = automatic_setup()}
+        "N" | "n" => {(lat, long) = manual_setup()}
+        _ => {error("Invalid character(s)");}
+    }
     print!("Use Metric system?(Y or N): ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut metric).expect("Error reading user input");
+    metric = flush_read(metric);
     match metric.as_str().trim() {
         "Y" | "y" => {metric_bool = true}
         "N" | "n" => {}
-        _ => {error("Value entered is not parseable");}
+        _ => {error("Invalid character(s)");}
     }
     return (lat, long, metric_bool);
+}
+
+//Allows the user to manually set their location using coordinates
+fn manual_setup() -> (String, String) {
+    let mut lat = String::new();
+    let mut long = String::new();
+    print!("Latitude: ");
+    lat = flush_read(lat);
+    input_error_check(lat.as_str());
+    print!("Longitude: ");
+    long = flush_read(long);
+    input_error_check(long.as_str());
+    return (lat.trim().to_string(), long.trim().to_string())
+}
+
+fn flush_read(mut input: String) -> String {
+    std::io::stdout().flush().expect("Error flushing output");
+    std::io::stdin().read_line(&mut input).expect("Error reading user input");
+    return input
+}
+
+//Automatically sets the users coordinates
+fn automatic_setup() -> (String, String){
+    let mut lat = String::new();
+    let mut long = String::new();
+    let mut allow = String::new();
+    println!("By using automatic setup you are allowing Weatherbird to access your public IP and forward it to the ipapi service.");
+    print!("Would you still like to continue?(Y or N): ");
+    allow = flush_read(allow);
+    match allow.as_str().trim() {
+        "Y" | "y" => {(lat, long) = location::location_get()}
+        "N" | "n" => {std::process::exit(0)}
+        _ => {error("Invalid character(s)");}
+    }
+    return (lat, long);
 }
 
 // Mainly used for set(), but can be expanded for other functions in the future
 fn input_error_check(num: &str) {
     match num.trim().parse::<f64>() {
         Ok(_) => {}
-        Err(_) => {error("Value entered is not parseable");}
+        Err(_) => {error("Invalid character(s)");}
     }
 }
 
@@ -275,7 +309,7 @@ fn forecast_hourly(hourly_info: Hourly, hours: usize) {
         hour_index += 1;
     }
     let hour_index_end: usize = hour_index + hours;
-    let weather_codes: Vec<String> = code_alloc(hourly_info.weather_code, hour_index_end);
+    let weather_codes: Vec<&str> = code_alloc(hourly_info.weather_code, hour_index_end);
     for num in hour_index..hour_index_end {
         println!("\r-------------------");
         println!("Hour: {}", NaiveDateTime::parse_from_str(&hourly_info.time[num], "%Y-%m-%dT%H:%M").unwrap().hour());
@@ -288,10 +322,10 @@ fn forecast_hourly(hourly_info: Hourly, hours: usize) {
 
 // Used for both forecast() and forecast_hourly(), this converts weather codes
 // into corresponding descriptions of the weather
-fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
-    let mut weathers: Vec<String> = Vec::new();
+fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<&'static str> {
+    let mut weathers: Vec<&str> = Vec::new();
     for num in 0..size {
-        weathers.push((match codes[num] {
+        weathers.push(match codes[num] {
             0 => {"Clear"}
             1 | 2 => {"Partly cloudy"}
             3 => {"Overcast"}
@@ -307,7 +341,7 @@ fn code_alloc(codes: Vec<u8>, size: usize) -> Vec<String> {
             96 | 99 => {"Hail"}
             _ => {"Unknown"}
             }
-        ).to_string())
+        )
     }
     return weathers;
 }
