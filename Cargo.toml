@@ -1,6 +1,6 @@
 [package]
 name = "weatherbird"
-version = "0.6.1"
+version = "0.6.2"
 edition = "2024"
 authors = [
     "Cameron Reynolds <cameron@starlordv125.net>",
