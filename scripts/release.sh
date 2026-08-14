@@ -15,7 +15,7 @@ curl -X 'POST' \
 -H "Authorization: token $API_KEY" \
 -H 'Content-Type: application/json' \
 -d "{
-"body": $MESSAGE,
+"body": "$MESSAGE",
 "draft": false,
 "hide_archive_links": false,
 "name": "v$VERSION",
