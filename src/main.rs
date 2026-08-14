@@ -201,21 +201,20 @@ fn set() -> (String, String, bool){
     let mut lat = String::new();
     let mut long = String::new();
     println!("Weatherbird location setup");
-    print!("Would you like Weatherbird to automatically set location?(Y or N, not reccomended if using vpn): ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut auto).expect("Error reading user input");
+    println!("Would you like Weatherbird to automatically set location?");
+    print!("(Y or N, not recomended if using vpn): ");
+    auto = flush_read(auto);
     match auto.as_str().trim() {
         "Y" | "y" => {(lat, long) = automatic_setup()}
         "N" | "n" => {(lat, long) = manual_setup()}
-        _ => {error("Value entered is not parseable");}
+        _ => {error("Invalid character(s)");}
     }
     print!("Use Metric system?(Y or N): ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut metric).expect("Error reading user input");
+    metric = flush_read(metric);
     match metric.as_str().trim() {
         "Y" | "y" => {metric_bool = true}
         "N" | "n" => {}
-        _ => {error("Value entered is not parseable");}
+        _ => {error("Invalid character(s)");}
     }
     return (lat, long, metric_bool);
 }
@@ -225,16 +224,18 @@ fn manual_setup() -> (String, String) {
     let mut lat = String::new();
     let mut long = String::new();
     print!("Latitude: ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut lat).expect("Error reading user input");
+    lat = flush_read(lat);
     input_error_check(lat.as_str());
     print!("Longitude: ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut long).expect("Error reading user input");
+    long = flush_read(long);
     input_error_check(long.as_str());
-    lat = lat.trim().to_string();
-    long = long.trim().to_string();
-    return (lat, long)
+    return (lat.trim().to_string(), long.trim().to_string())
+}
+
+fn flush_read(mut input: String) -> String {
+    std::io::stdout().flush().expect("Error flushing output");
+    std::io::stdin().read_line(&mut input).expect("Error reading user input");
+    return input
 }
 
 //Automatically sets the users coordinates
@@ -242,13 +243,13 @@ fn automatic_setup() -> (String, String){
     let mut lat = String::new();
     let mut long = String::new();
     let mut allow = String::new();
-    print!("By using automatic setup you are allowing Weatherbird to access your public IP and forward it to the ipapi service\nWould you still like to continue?(Y or N): ");
-    std::io::stdout().flush().expect("Error flushing output");
-    std::io::stdin().read_line(&mut allow).expect("Error reading user input");
+    println!("By using automatic setup you are allowing Weatherbird to access your public IP and forward it to the ipapi service.");
+    print!("Would you still like to continue?(Y or N): ");
+    allow = flush_read(allow);
     match allow.as_str().trim() {
         "Y" | "y" => {(lat, long) = location::location_get()}
-        "N" | "n" => {(lat, long) = manual_setup()}
-        _ => {error("Value entered is not parseable");}
+        "N" | "n" => {std::process::exit(0)}
+        _ => {error("Invalid character(s)");}
     }
     return (lat, long);
 }
@@ -257,7 +258,7 @@ fn automatic_setup() -> (String, String){
 fn input_error_check(num: &str) {
     match num.trim().parse::<f64>() {
         Ok(_) => {}
-        Err(_) => {error("Value entered is not parseable");}
+        Err(_) => {error("Invalid character(s)");}
     }
 }
 
