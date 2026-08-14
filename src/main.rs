@@ -175,7 +175,7 @@ fn help() {
     println!("|Arguements                                                                            |");
     println!("|--help or -h -> Displays this menu                                                    |");
     println!("|--version or -v -> Shows version number                                               |");
-    println!("|set -> Allows you to set coordinates, will overwrite previous configuration           |");
+    println!("|set -> Interactive settings menu, will overwrite previous configuration               |");
     println!("|days [1-7] -> Shows a forecast of up to seven days                                    |");
     println!("|hours [1-24] -> Shows a forecast of up to twenty-four hours                           |");
     println!("|--------------------------------------------------------------------------------------|");
