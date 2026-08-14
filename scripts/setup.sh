@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# DEBUG
+echo $MESSAGE
+
 # Release setup
 mkdir package
 mkdir package/weatherbird-linux-amd64
