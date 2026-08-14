@@ -1,0 +1,8 @@
+#!/bin/bash
+
+_Weatherbird() {
+local cur
+cur=${COMP_WORDS[COMP_CWORD]}
+COMPREPLY=( $(compgen -W "set days hours --help --version" -- "$cur") )
+}
+complete -F _Weatherbird weatherbird
