@@ -89,7 +89,7 @@ impl NumArg {
     }
 }
 // Change this when upgrading
-const VERSION: &str = "v0.5.2";
+const VERSION: &str = "v0.6.1";
 
 fn main() {
     let info: ArgInfo = collect_args();
