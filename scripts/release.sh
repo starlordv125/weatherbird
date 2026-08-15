@@ -15,13 +15,13 @@ curl -X 'POST' \
 -H "Authorization: token $API_KEY" \
 -H 'Content-Type: application/json' \
 -d "{
-"body": "'"$MESSAGE"'",
-"draft": false,
-"hide_archive_links": false,
-"name": "v$VERSION",
-"prerelease": false,
-"tag_name": "v$VERSION",
-"target_commitish": "main"
+'body': "$MESSAGE",
+'draft': false,
+'hide_archive_links': false,
+'name': "v$VERSION",
+'prerelease': false,
+'tag_name': "v$VERSION",
+'target_commitish': "main"
 }"
 
 # Upload binary

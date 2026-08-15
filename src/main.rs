@@ -66,8 +66,7 @@ impl NumArg {
 
     fn check_parse(&self) -> Result<usize, ParseIntError> {
         match self {
-            Days(num) => {return num.parse::<usize>()}
-            Hours(num) => {return num.parse::<usize>()}
+            Days(num) | Hours(num) => {return num.parse::<usize>()}
         }
     }
 
